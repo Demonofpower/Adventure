@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using Adv.Sniffer.Enums;
 
 namespace Adv.Sniffer
 {
@@ -39,7 +40,7 @@ namespace Adv.Sniffer
 
             this.output = output;
             this.name = name;
-            reverser = new PacketReverser();
+            reverser = new PacketReverser(name);
         }
         
         public bool Start(String remoteTarget = "127.0.0.1", Int32 remotePort = 7777)
@@ -341,7 +342,7 @@ namespace Adv.Sniffer
         {
             if (output)
             {
-                return reverser.Reverse(data, sender, name, this);        
+                return reverser.Reverse(data, sender, this);        
             }
 
             return true;

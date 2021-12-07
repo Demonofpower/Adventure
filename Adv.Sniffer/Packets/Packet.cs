@@ -1,7 +1,7 @@
 ﻿using System;
-using Org.BouncyCastle.Utilities.Encoders;
+using Adv.Sniffer.Enums;
 
-namespace Adv.Sniffer
+namespace Adv.Sniffer.Packets
 {
     class Packet
     {
@@ -32,7 +32,6 @@ namespace Adv.Sniffer
                     Console.WriteLine(Name + " " + Id + " " + xHex + " " + yHex + " " + zHex + " " + remainingData);
                     break;
                 default:
-                    break;
                     Console.WriteLine(Sender + "#" + Name);
                     break;
             }
