@@ -1,20 +1,69 @@
-// Adv.Agency.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
+#include <Windows.h>
+#include <TlHelp32.h>
 #include <iostream>
+
+DWORD FindProcessId(const std::wstring&);
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    const char* dllPath = "C:\\Users\\Juli\\Desktop\\src\\Adventure\\Debug\\Adv.Spy.dll";
+
+    DWORD procId = 0;
+
+    while (!procId)
+    {
+        procId = FindProcessId(L"PwnAdventure3-Win32-Shipping.exe");
+        Sleep(30);
+    }
+
+    HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS, 0, procId);
+
+    if (hProc && hProc != INVALID_HANDLE_VALUE)
+    {
+        void* loc = VirtualAllocEx(hProc, 0, MAX_PATH, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+
+        WriteProcessMemory(hProc, loc, dllPath, strlen(dllPath) + 1, 0);
+
+        HANDLE hThread = CreateRemoteThread(hProc, 0, 0, (LPTHREAD_START_ROUTINE)LoadLibraryA, loc, 0, 0);
+
+        if (hThread)
+        {
+            CloseHandle(hThread);
+        }
+    }
+
+    if (hProc)
+    {
+        CloseHandle(hProc);
+    }
+    return 0;
 }
 
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
+DWORD FindProcessId(const std::wstring& processName)
+{
+    PROCESSENTRY32 processInfo;
+    processInfo.dwSize = sizeof(processInfo);
 
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+    HANDLE processesSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
+    if (processesSnapshot == INVALID_HANDLE_VALUE)
+        return 0;
+
+    Process32First(processesSnapshot, &processInfo);
+    if (!processName.compare(processInfo.szExeFile))
+    {
+        CloseHandle(processesSnapshot);
+        return processInfo.th32ProcessID;
+    }
+
+    while (Process32Next(processesSnapshot, &processInfo))
+    {
+        if (!processName.compare(processInfo.szExeFile))
+        {
+            CloseHandle(processesSnapshot);
+            return processInfo.th32ProcessID;
+        }
+    }
+
+    CloseHandle(processesSnapshot);
+    return 0;
+}
