@@ -23,6 +23,7 @@
 uintptr_t moduleBase = (uintptr_t)GetModuleHandle(L"PwnAdventure3-Win32-Shipping.exe");
 uintptr_t ws2_32_moduleBase = (uintptr_t)GetModuleHandle(L"WS2_32.DLL");
 
+PacketReverser reverser;
 
 SOCKET socketMaster;
 SOCKET socketGame;
@@ -54,7 +55,7 @@ int __stdcall SendFunc(SOCKET socket, char* buffer, int len, int flags)
 
 	printf(" <-- ");
 
-	PacketReverser::Reverse(buffer, len);
+	reverser.Reverse(buffer, len);
 
 	printf("\n");
 
@@ -77,7 +78,7 @@ int __stdcall RecvFunc(SOCKET socket, char* buffer, int len, int flags)
 
 	printf(" --> ");
 
-	PacketReverser::Reverse(buffer, len);
+	reverser.Reverse(buffer, len);
 
 	printf("\n");
 
@@ -124,6 +125,10 @@ DWORD WINAPI HackThread(HMODULE hModule)
 		if (GetAsyncKeyState(VK_F12) & 1)
 		{
 			break;
+		}
+		if (GetAsyncKeyState(VK_F2) & 1)
+		{
+			system("cls");
 		}
 		Sleep(10);
 	}

@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\Packet">
+      <UniqueIdentifier>{f98eeade-97a8-4aa2-ae93-26daa0d5ffdd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Hax">
+      <UniqueIdentifier>{e0f45f09-64c1-44ec-ab3e-7095dab98556}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -30,6 +36,9 @@
     <ClInclude Include="TrampolineHook.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Packet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -38,14 +47,17 @@
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Util.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PacketReverser.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Packet</Filter>
+    </ClCompile>
+    <ClCompile Include="Packet.cpp">
+      <Filter>Source Files\Packet</Filter>
+    </ClCompile>
+    <ClCompile Include="Util.cpp">
+      <Filter>Source Files\Hax</Filter>
     </ClCompile>
     <ClCompile Include="TrampolineHook.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Hax</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

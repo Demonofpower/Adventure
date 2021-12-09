@@ -1,6 +1,14 @@
 #pragma once
+#include <list>
+
+class Packet;
+
 class PacketReverser
 {
 public:
-	static void Reverse(char *buffer, int length);
+	std::list<Packet*> knownPackets;
+
+	PacketReverser();
+
+	void Reverse(char *buffer, int length);
 };
