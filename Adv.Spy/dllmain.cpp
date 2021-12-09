@@ -5,6 +5,9 @@
 #include <iostream>
 #include <ostream>
 
+
+#include "PacketReverser.h"
+#include "TrampolineHook.h"
 #include "Util.h"
 
 #define ANSI_COLOR_RED     "\x1b[31m"
@@ -51,10 +54,8 @@ int __stdcall SendFunc(SOCKET socket, char* buffer, int len, int flags)
 
 	printf(" <-- ");
 
-	for (int i = 0; i < len; ++i)
-	{
-		printf("%02X ", (BYTE)buffer[i]);
-	}
+	PacketReverser::Reverse(buffer, len);
+
 	printf("\n");
 
 	return hSendFunc(socket, buffer, len, flags);
@@ -75,11 +76,9 @@ int __stdcall RecvFunc(SOCKET socket, char* buffer, int len, int flags)
 	}
 
 	printf(" --> ");
-	
-	for (int i = 0; i < len; ++i)
-	{
-		printf("%02X ", (BYTE)buffer[i]);
-	}
+
+	PacketReverser::Reverse(buffer, len);
+
 	printf("\n");
 
 	return hRecvFunc(socket, buffer, len, flags);
@@ -98,17 +97,29 @@ DWORD WINAPI HackThread(HMODULE hModule)
 	std::cout << ws2_32_moduleBase << std::endl;
 	std::cout << std::dec;
 
-
+	bool socketHooksEnabled = false;
+	hSendFunc = (sendFunc)(GetProcAddress(GetModuleHandleA("ws2_32.dll"), "send"));
+	TrampolineHook sendHook((BYTE**)&hSendFunc, (BYTE*)SendFunc, 5);
+	hRecvFunc = (recvFunc)(GetProcAddress(GetModuleHandleA("ws2_32.dll"), "recv"));
+	TrampolineHook recvHook((BYTE**)&hRecvFunc, (BYTE*)RecvFunc, 5);
 	while (true)
 	{
 		if (GetAsyncKeyState(VK_F1) & 1)
 		{
-			std::cout << "hooked!" << std::endl;;
-			hSendFunc = (sendFunc)(GetProcAddress(GetModuleHandleA("ws2_32.dll"), "send"));
-			hSendFunc = (sendFunc)Util::TrampolineHook((BYTE*)hSendFunc, (BYTE*)SendFunc, 5);
 
-			hRecvFunc = (recvFunc)(GetProcAddress(GetModuleHandleA("ws2_32.dll"), "recv"));
-			hRecvFunc = (recvFunc)Util::TrampolineHook((BYTE*)hRecvFunc, (BYTE*)RecvFunc, 5);
+			if (!socketHooksEnabled)
+			{
+				std::cout << "hooked!" << std::endl;
+				sendHook.Enable();
+				recvHook.Enable();
+			}
+			else
+			{
+				std::cout << "restored!" << std::endl;;
+				sendHook.Disable();
+				recvHook.Disable();
+			}
+			socketHooksEnabled = !socketHooksEnabled;
 		}
 		if (GetAsyncKeyState(VK_F12) & 1)
 		{
