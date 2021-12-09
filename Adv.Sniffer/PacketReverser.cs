@@ -60,8 +60,8 @@ namespace Adv.Sniffer
             {
                 if (data.StartsWith(knownPacket.Id))
                 {
-                    knownPacket.Print(data);
-                    known = true;
+                    //knownPacket.Print(data);
+                    //known = true;
                 }
             }
 

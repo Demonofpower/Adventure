@@ -1,6 +1,6 @@
 #include "pch.h"
 #include <Windows.h>
-#include "winsock2.h"
+#include "WinSock2.h"
 
 #include <iostream>
 #include <ostream>
@@ -15,33 +15,67 @@
 #define ANSI_COLOR_CYAN    "\x1b[36m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
+#pragma comment(lib, "Ws2_32.lib")
+
 uintptr_t moduleBase = (uintptr_t)GetModuleHandle(L"PwnAdventure3-Win32-Shipping.exe");
 uintptr_t ws2_32_moduleBase = (uintptr_t)GetModuleHandle(L"WS2_32.DLL");
 
 
-typedef int(__stdcall* sendFunc)(SOCKET socket, char* buffer, int len, int flags);
+SOCKET socketMaster;
+SOCKET socketGame;
+typedef int (__stdcall* sendFunc)(SOCKET socket, char* buffer, int len, int flags);
 sendFunc hSendFunc;
-SOCKET socketFunctionCall;
+
 int __stdcall SendFunc(SOCKET socket, char* buffer, int len, int flags)
 {
-	socketFunctionCall = socket;
-	
+	if (!socketGame)
+	{
+		if (!socketMaster)
+		{
+			socketMaster = socket;
+		}
+		else
+		{
+			socketGame = socket;
+		}
+	}
+
+	if (socket == socketMaster)
+	{
+		printf("[Master]");
+	}
+	else
+	{
+		printf("[Game]");
+	}
+
+	printf(" <-- ");
+
 	for (int i = 0; i < len; ++i)
 	{
 		printf("%02X ", (BYTE)buffer[i]);
 	}
 	printf("\n");
-	
+
 	return hSendFunc(socket, buffer, len, flags);
 }
 
-typedef int(__stdcall* recvFunc)(SOCKET socket, char* buffer, int len, int flags);
+typedef int (__stdcall* recvFunc)(SOCKET socket, char* buffer, int len, int flags);
 recvFunc hRecvFunc;
-SOCKET socketFunctionRecv;
+
 int __stdcall RecvFunc(SOCKET socket, char* buffer, int len, int flags)
 {
-	socketFunctionRecv = socket;
+	if (socket == socketMaster)
+	{
+		printf("[Master]");
+	}
+	else
+	{
+		printf("[Game]");
+	}
 
+	printf(" --> ");
+	
 	for (int i = 0; i < len; ++i)
 	{
 		printf("%02X ", (BYTE)buffer[i]);
@@ -58,12 +92,12 @@ DWORD WINAPI HackThread(HMODULE hModule)
 	freopen_s(&f, "CONOUT$", "w", stdout);
 
 	std::cout << "Working" << std::endl;
-	
+
 	std::cout << std::hex;
 	std::cout << moduleBase << std::endl;
-	std::cout << ws2_32_moduleBase << std::endl;	
+	std::cout << ws2_32_moduleBase << std::endl;
 	std::cout << std::dec;
-		
+
 
 	while (true)
 	{
