@@ -45,11 +45,13 @@ void PacketReverser::Reverse(char* buffer, int size)
 		if (Hex::StartsSame(knownPacket->id, buffer, knownPacket->idSize))
 		{
 			knownPacket->Print(buffer, size);
+
+			return;
 		}
 	}
 
-	/*for (int i = 0; i < idSize; ++i)
+	for (int i = 0; i < size; ++i)
 	{
 		printf("%02X ", (BYTE)buffer[i]);
-	}*/
+	}
 }

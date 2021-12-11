@@ -17,5 +17,4 @@ void Packet::Print(char* buffer, int size, bool silent)
 	{
 		printf("%02X ", (BYTE)packet.c_str()[i]);
 	}*/
-	printf("\n");
 }

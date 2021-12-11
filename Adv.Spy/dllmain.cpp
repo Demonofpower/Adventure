@@ -1,24 +1,16 @@
 #include "pch.h"
+
+#pragma warning( disable : 4996)
+#pragma comment(lib, "Ws2_32.lib")
+
 #include <Windows.h>
 #include "WinSock2.h"
 
 #include <iostream>
 #include <ostream>
 
-
 #include "PacketReverser.h"
 #include "TrampolineHook.h"
-#include "Util.h"
-
-#define ANSI_COLOR_RED     "\x1b[31m"
-#define ANSI_COLOR_GREEN   "\x1b[32m"
-#define ANSI_COLOR_YELLOW  "\x1b[33m"
-#define ANSI_COLOR_BLUE    "\x1b[34m"
-#define ANSI_COLOR_MAGENTA "\x1b[35m"
-#define ANSI_COLOR_CYAN    "\x1b[36m"
-#define ANSI_COLOR_RESET   "\x1b[0m"
-
-#pragma comment(lib, "Ws2_32.lib")
 
 uintptr_t moduleBase = (uintptr_t)GetModuleHandle(L"PwnAdventure3-Win32-Shipping.exe");
 uintptr_t ws2_32_moduleBase = (uintptr_t)GetModuleHandle(L"WS2_32.DLL");
@@ -27,34 +19,44 @@ PacketReverser reverser;
 
 SOCKET socketMaster;
 SOCKET socketGame;
-typedef int (__stdcall* sendFunc)(SOCKET socket, char* buffer, int len, int flags);
-sendFunc hSendFunc;
 
-int __stdcall SendFunc(SOCKET socket, char* buffer, int len, int flags)
+Type HandleSocket(SOCKET socket)
 {
-	if (!socketGame)
+	struct sockaddr_in local_address;
+	int addr_size = sizeof(local_address);
+	getpeername(socket, (struct sockaddr*)&local_address, &addr_size);
+
+	char* connected_ip = inet_ntoa(local_address.sin_addr);
+	int port = ntohs(local_address.sin_port);
+
+	if (port == 3333)
 	{
 		if (!socketMaster)
 		{
 			socketMaster = socket;
 		}
-		else
-		{
-			socketGame = socket;
-		}
-	}
 
-	Type currType;
-	if (socket == socketMaster)
-	{
-		currType = MASTER;
+		return MASTER;
 	}
 	else
 	{
-		currType = GAME;
-	}
+		if (!socketGame)
+		{
+			socketGame = socket;
+		}
 
-	reverser.Print(buffer, len, RECV, currType);
+		return GAME;
+	}
+}
+
+typedef int (__stdcall* sendFunc)(SOCKET socket, char* buffer, int len, int flags);
+sendFunc hSendFunc;
+
+int __stdcall SendFunc(SOCKET socket, char* buffer, int len, int flags)
+{
+	Type currType = HandleSocket(socket);
+
+	reverser.Print(buffer, len, SEND, currType);
 
 	return hSendFunc(socket, buffer, len, flags);
 }
@@ -64,15 +66,7 @@ recvFunc hRecvFunc;
 
 int __stdcall RecvFunc(SOCKET socket, char* buffer, int len, int flags)
 {
-	Type currType;
-	if (socket == socketMaster)
-	{
-		currType = MASTER;
-	}
-	else
-	{
-		currType = GAME;
-	}
+	Type currType = HandleSocket(socket);
 
 	reverser.Print(buffer, len, RECV, currType);
 
@@ -101,7 +95,6 @@ DWORD WINAPI HackThread(HMODULE hModule)
 	{
 		if (GetAsyncKeyState(VK_F1) & 1)
 		{
-
 			if (!socketHooksEnabled)
 			{
 				std::cout << "hooked!" << std::endl;
