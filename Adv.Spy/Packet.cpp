@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-void Packet::Print(std::string packet, bool silent = false)
+void Packet::Print(char* buffer, int size, bool silent)
 {
 	if (silent)
 	{
@@ -13,7 +13,7 @@ void Packet::Print(std::string packet, bool silent = false)
 
 	std::cout << name;
 
-	/*for (int i = 0; i < packet.length(); ++i)
+	/*for (int i = 0; i < packet.idSize(); ++i)
 	{
 		printf("%02X ", (BYTE)packet.c_str()[i]);
 	}*/

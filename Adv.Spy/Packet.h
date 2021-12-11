@@ -6,14 +6,14 @@ class Packet
 public:
 	std::string name;
 	char* id;
-	char* length;
+	int idSize;
 
-	Packet(std::string name, char* id)
+	Packet(std::string name, char* id, int idSize)
 	{
 		this->name = name;
 		this->id = id;
+		this->idSize = idSize;
 	}
 	
-	void Print(std::string packet, bool silent);
+	void Print(char* buffer, int size, bool silent = false);
 };
-

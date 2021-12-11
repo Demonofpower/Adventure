@@ -39,6 +39,9 @@
     <ClInclude Include="Packet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="HexArithmetic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -58,6 +61,9 @@
     </ClCompile>
     <ClCompile Include="TrampolineHook.cpp">
       <Filter>Source Files\Hax</Filter>
+    </ClCompile>
+    <ClCompile Include="HexArithmetic.cpp">
+      <Filter>Source Files\Packet</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

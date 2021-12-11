@@ -1,27 +1,55 @@
 #include "pch.h"
 #include "PacketReverser.h"
 
+
+#include "HexArithmetic.h"
 #include "Packet.h"
 
 PacketReverser::PacketReverser()
 {
 	knownPackets = std::list<Packet*>();
 
-	knownPackets.push_front(new Packet("ClientHello", (char*) "\x16\x03\x01\x00\xD2\x01\x00\x00\xCE\x03\x01"));
+	knownPackets.push_front(new Packet("ClientHello", (char*)"\x16\x03\x01\x00\xD2\x01\x00\x00\xCE\x03\x01", 11));
 }
 
-void PacketReverser::Reverse(char* buffer, int length)
-{	
-	for (auto known_packet : knownPackets)
+void PacketReverser::Print(char* buffer, int size, Direction dir, Type type)
+{
+	if (type == MASTER)
 	{
-		if (strcmp(known_packet->id, buffer) != 0)
+		printf("[Master]");
+	}
+	else
+	{
+		printf("[Game]");
+	}
+
+	if (dir == SEND)
+	{
+		printf(" <-- ");
+	}
+	else
+	{
+		printf(" --> ");
+	}
+
+	Reverse(buffer, size);
+
+	printf("\n");
+}
+
+
+void PacketReverser::Reverse(char* buffer, int size)
+{
+	for (auto knownPacket : knownPackets)
+	{
+		if (Hex::StartsSame(knownPacket->id, buffer, knownPacket->idSize))
 		{
-			known_packet->Print(buffer, false);
+			knownPacket->Print(buffer, size);
 		}
 	}
-	
-	for (int i = 0; i < length; ++i)
+
+	/*for (int i = 0; i < idSize; ++i)
 	{
 		printf("%02X ", (BYTE)buffer[i]);
-	}
+	}*/
 }

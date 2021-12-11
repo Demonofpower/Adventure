@@ -152,6 +152,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="HexArithmetic.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="PacketReverser.h" />
     <ClInclude Include="pch.h" />
@@ -160,6 +161,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="HexArithmetic.cpp" />
     <ClCompile Include="Packet.cpp" />
     <ClCompile Include="PacketReverser.cpp" />
     <ClCompile Include="pch.cpp">

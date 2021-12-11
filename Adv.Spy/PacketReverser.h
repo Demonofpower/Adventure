@@ -1,6 +1,18 @@
 #pragma once
 #include <list>
 
+enum Direction
+{
+	SEND,
+	RECV
+};
+
+enum Type
+{
+	GAME,
+	MASTER
+};
+
 class Packet;
 
 class PacketReverser
@@ -10,5 +22,6 @@ public:
 
 	PacketReverser();
 
-	void Reverse(char *buffer, int length);
+	void Print(char* buffer, int size, Direction dir, Type type);
+	void Reverse(char *buffer, int size);
 };

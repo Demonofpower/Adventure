@@ -44,20 +44,17 @@ int __stdcall SendFunc(SOCKET socket, char* buffer, int len, int flags)
 		}
 	}
 
+	Type currType;
 	if (socket == socketMaster)
 	{
-		printf("[Master]");
+		currType = MASTER;
 	}
 	else
 	{
-		printf("[Game]");
+		currType = GAME;
 	}
 
-	printf(" <-- ");
-
-	reverser.Reverse(buffer, len);
-
-	printf("\n");
+	reverser.Print(buffer, len, RECV, currType);
 
 	return hSendFunc(socket, buffer, len, flags);
 }
@@ -67,20 +64,17 @@ recvFunc hRecvFunc;
 
 int __stdcall RecvFunc(SOCKET socket, char* buffer, int len, int flags)
 {
+	Type currType;
 	if (socket == socketMaster)
 	{
-		printf("[Master]");
+		currType = MASTER;
 	}
 	else
 	{
-		printf("[Game]");
+		currType = GAME;
 	}
 
-	printf(" --> ");
-
-	reverser.Reverse(buffer, len);
-
-	printf("\n");
+	reverser.Print(buffer, len, RECV, currType);
 
 	return hRecvFunc(socket, buffer, len, flags);
 }
