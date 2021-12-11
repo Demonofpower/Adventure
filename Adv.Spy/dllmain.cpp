@@ -8,6 +8,8 @@
 
 #include <iostream>
 #include <ostream>
+#include <vector>
+
 
 #include "PacketReverser.h"
 #include "TrampolineHook.h"
@@ -57,7 +59,7 @@ int __stdcall SendFunc(SOCKET socket, char* buffer, int len, int flags)
 	Type currType = HandleSocket(socket);
 
 	reverser.Print(buffer, len, SEND, currType);
-
+		
 	return hSendFunc(socket, buffer, len, flags);
 }
 
@@ -69,7 +71,7 @@ int __stdcall RecvFunc(SOCKET socket, char* buffer, int len, int flags)
 	Type currType = HandleSocket(socket);
 
 	reverser.Print(buffer, len, RECV, currType);
-
+	
 	return hRecvFunc(socket, buffer, len, flags);
 }
 
@@ -85,6 +87,8 @@ DWORD WINAPI HackThread(HMODULE hModule)
 	std::cout << moduleBase << std::endl;
 	std::cout << ws2_32_moduleBase << std::endl;
 	std::cout << std::dec;
+
+	Pipe::CreatePipe();
 
 	bool socketHooksEnabled = false;
 	hSendFunc = (sendFunc)(GetProcAddress(GetModuleHandleA("ws2_32.dll"), "send"));
