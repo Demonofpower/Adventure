@@ -124,6 +124,12 @@ DWORD WINAPI HackThread(HMODULE hModule)
 		Sleep(10);
 	}
 
+	if(socketHooksEnabled)
+	{
+		sendHook.Disable();
+		recvHook.Disable();
+	}
+	
 	fclose(f);
 	FreeConsole();
 	FreeLibraryAndExitThread(hModule, 0);

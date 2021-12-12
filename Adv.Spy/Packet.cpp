@@ -20,29 +20,25 @@ inline HexCharStruct hex(unsigned char _c)
 	return HexCharStruct(_c);
 }
 
-void Packet::Print(char* buffer, int size, bool silent)
-{
-	if (silent)
-	{
-		std::cout << name << std::endl;
-		return;
-	}
-
-	std::cout << name;
-
-	std::cout << std::endl;
-
-	FILE* fptr;
-	fopen_s(&fptr, "C:\\Users\\Juli\\Desktop\\src\\Adventure\\Debug\\Sessions\\a.txt", "a");
-	
-	for (int i = 0; i < size; ++i)
-	{
-		printf("%02X ", (BYTE)buffer[i]);
-
-		fprintf(fptr, "%02X", (BYTE)buffer[i]);
-	}
-
-	fprintf(fptr, "\n");
-
-	fclose(fptr);
-}
+//void Packet::Print(char* buffer, int size, bool silent)
+//{
+//	if (silent)
+//	{
+//		std::cout << name << std::endl;
+//		return;
+//	}
+//
+//	/*FILE* fptr;
+//	fopen_s(&fptr, "C:\\Users\\Juli\\Desktop\\src\\Adventure\\Debug\\Sessions\\a.txt", "a");
+//	
+//	for (int i = 0; i < size; ++i)
+//	{
+//		printf("%02X ", (BYTE)buffer[i]);
+//
+//		fprintf(fptr, "%02X", (BYTE)buffer[i]);
+//	}
+//
+//	fprintf(fptr, "\n");
+//
+//	fclose(fptr);*/
+//}

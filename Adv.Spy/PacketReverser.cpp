@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "PacketReverser.h"
 
+#include <iostream>
+
+
 #include "HexArithmetic.h"
 #include "Packet.h"
 
@@ -40,69 +43,206 @@ PacketReverser::PacketReverser()
 {
 	knownPackets = std::list<Packet*>();
 
-	knownPackets.push_front(new Packet("ClientHello", (char*)"\x16\x03\x01\x00\xD2\x01\x00\x00\xCE\x03\x01", 11));
+	knownPackets.push_front(new Packet(ClientPosition, (WORD*)"\x6D\x76"));
+	knownPackets.push_front(new Packet(ClientJump, (WORD*)"\x6A\x70"));
+	knownPackets.push_front(new Packet(ClientFireball, (WORD*)"\x2A\x69"));
+	knownPackets.push_front(new Packet(ClientSetHand, (WORD*)"\x73\x3D"));
+
+	knownPackets.push_front(new Packet(ServerOk, (WORD*)"\x52\x48"));
 }
 
 void PacketReverser::Print(char* buffer, int size, Direction dir, Type type)
 {
-	bool silent = true;
-	if (!silent)
-	{
-		if (type == MASTER)
-		{
-			printf("[Master]");
-		}
-		else
-		{
-			printf("[Game]");
-		}
+	bool silent = false;
 
-		if (dir == SEND)
-		{
-			printf(" <-- ");
-		}
-		else
-		{
-			printf(" --> ");
-		}
-	}
-
-	Reverse(buffer, size, dir, type);
-
-	if (!silent)
-	{
-		printf("\n");
-	}
+	Reverse(buffer, size, dir, type, silent);
 }
 
 
-void PacketReverser::Reverse(char* buffer, int size, Direction dir, Type type)
+void PacketReverser::Reverse(char* buffer, int size, Direction dir, Type type, bool silent)
 {
-	for (auto knownPacket : knownPackets)
+	char* realBuffer = buffer;
+
+re:
+	while (buffer < realBuffer + size)
 	{
-		if (Hex::StartsSame(knownPacket->id, buffer, knownPacket->idSize))
+	start:
+		for (auto knownPacket : knownPackets)
 		{
-			knownPacket->Print(buffer, size);
-
-			Pipe::Pckt p(buffer, size);
-			int port;
-			if (type == GAME)
+			if (*knownPacket->id == *((WORD*)buffer))
 			{
-				port = 3002;
-			}
-			else
-			{
-				port = 3333;
+				buffer += 2;
 
+				switch (knownPacket->type)
+				{
+				case ClientSetHand:
+					{
+						const SetHandPacketHandler handler(buffer);
+						buffer += sizeof(SetHandPacket);
+						std::cout << "ClientSetHand: " << ((int)handler.packet->slot) << std::endl;
+						break;
+					}
+				case ClientPosition:
+					{
+						std::cout << "ClientPosition" << std::endl;
+						buffer += 1000;
+						break;
+					}
+				case ClientJump:
+					{
+						std::cout << "ClientJump" << std::endl;
+						buffer += 1000;
+						break;
+					}
+				case ClientFireball:
+					{
+						std::cout << "ClientFireball" << std::endl;
+						buffer += 1000;
+						break;
+					}
+				case ServerOk:
+					{
+						std::cout << "ServerOk" << std::endl;
+						buffer += 1000;
+						break;
+					}
+				case ServerSetHandAck1:
+					{
+						std::cout << "ServerSetHandAck1" << std::endl;
+						buffer += 1000;
+						break;
+					}
+				case ServerSetHandAck2:
+					{
+						std::cout << "ServerSetHandAck2" << std::endl;
+						buffer += 1000;
+						break;
+					}
+				default:
+					std::cout << "Unimplemented packet" << std::endl;
+					buffer += 1000;
+					break;
+				}
 			}
-			SendPipe(&p, 0, port);
-
-			return;
 		}
-	}
+		int todo = size - (buffer - realBuffer);
 
-	/*for (int i = 0; i < size; ++i)
-	{
-		printf("%02X ", (BYTE)buffer[i]);
-	}*/
+		if (todo > 0)
+		{
+			if (!silent)
+			{
+				if (type == MASTER)
+				{
+					printf("[Master]");
+				}
+				else
+				{
+					printf("[Game]");
+				}
+
+				if (dir == SEND)
+				{
+					printf(" <-- ");
+				}
+				else
+				{
+					printf(" --> ");
+				}
+			}
+
+
+			for (int i = 0; i < todo; ++i)
+			{
+				/*for (auto knownPacket : knownPackets)
+				{
+					if (*knownPacket->id == *((WORD*)buffer))
+					{
+						printf("\n");
+						goto start;
+					}
+				}*/
+
+				printf("%02X ", (BYTE)buffer[i]);
+				buffer += 1;
+			}
+			printf("\n");
+		}
+
+
+		//for (auto knownPacket : knownPackets)
+		//{
+		//	if (*knownPacket->id == *((WORD*)buffer))
+		//	{
+		//		buffer += 2;
+
+		//		switch (knownPacket->type)
+		//		{
+		//		case ClientSetHand:
+		//			{
+		//				const SetHandPacketHandler handler(buffer);
+		//				buffer += sizeof(SetHandPacket);
+		//				std::cout << "ClientSetHand: " << handler.packet->slot << std::endl;
+		//				break;
+		//			}
+		//		default:
+		//			break;
+		//		}
+
+		//		/*knownPacket->Print(buffer, size);
+
+		//		Pipe::Pckt p(buffer, size);
+		//		int port;
+		//		if (type == GAME)
+		//		{
+		//			port = 3002;
+		//		}
+		//		else
+		//		{
+		//			port = 3333;
+		//		}
+		//		SendPipe(&p, 0, port);*/
+		//	}
+		//	else
+		//	{
+		//		buffer += 2;
+		//		int todo = size - (buffer - realBuffer);
+		//		if (!silent)
+		//		{
+		//			if (!silent)
+		//			{
+		//				if (type == MASTER)
+		//				{
+		//					printf("[Master]");
+		//				}
+		//				else
+		//				{
+		//					printf("[Game]");
+		//				}
+
+		//				if (dir == SEND)
+		//				{
+		//					printf(" <-- ");
+		//				}
+		//				else
+		//				{
+		//					printf(" --> ");
+		//				}
+		//			}
+
+		//			for (int i = 0; i < todo; ++i)
+		//			{
+		//				for (auto knownPacket : knownPackets)
+		//				{
+		//					if (*knownPacket->id == *((WORD*)buffer))
+		//					{
+		//					}
+		//				}
+
+		//				printf("%02X ", (BYTE)buffer[i]);
+		//			}
+		//			printf("\n");
+		//		}
+		//	}
+		//}
+	}
 }

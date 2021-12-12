@@ -1,19 +1,53 @@
 #pragma once
 #include <string>
 
+enum PacketType
+{
+	ClientPosition,
+	ClientJump,
+	ClientFireball,
+	ClientSetHand,
+	ServerOk,
+	ServerSetHandAck1,
+	ServerSetHandAck2
+};
+
+struct SetHandPacket
+{
+	BYTE slot;
+};
+
 class Packet
 {
 public:
-	std::string name;
-	char* id;
-	int idSize;
+	PacketType type;
+	WORD* id;
 
-	Packet(std::string name, char* id, int idSize)
+	Packet(PacketType type, WORD* id)
 	{
-		this->name = name;
+		this->type = type;
 		this->id = id;
-		this->idSize = idSize;
 	}
+};
+
+class RealPacket : Packet
+{
+public:
+	char* buffer;
+
+	RealPacket(PacketType type, WORD* id, char* buffer): Packet(type, id)
+	{
+		this->buffer = buffer;
+	}
+};
+
+class SetHandPacketHandler : RealPacket
+{
+public:
+	struct SetHandPacket* packet;
 	
-	void Print(char* buffer, int size, bool silent = false);
+	SetHandPacketHandler(char* buffer)	: RealPacket(ClientSetHand, (WORD*)"\x73\x3D", buffer)
+	{
+		packet = (SetHandPacket*) buffer;
+	}
 };

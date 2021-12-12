@@ -44,5 +44,5 @@ public:
 	PacketReverser();
 
 	void Print(char* buffer, int size, Direction dir, Type type);
-	void Reverse(char* buffer, int size, Direction dir, Type type);
+	void Reverse(char* buffer, int size, Direction dir, Type type, bool silent = false);
 };
