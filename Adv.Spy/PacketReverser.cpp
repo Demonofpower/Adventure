@@ -45,8 +45,9 @@ PacketReverser::PacketReverser()
 
 	knownPackets.push_front(new Packet(ClientPosition, (WORD*)"\x6D\x76"));
 	knownPackets.push_front(new Packet(ClientJump, (WORD*)"\x6A\x70"));
-	knownPackets.push_front(new Packet(ClientFireball, (WORD*)"\x2A\x69"));
+	knownPackets.push_front(new Packet(ClientShoot, (WORD*)"\x2A\x69"));
 	knownPackets.push_front(new Packet(ClientSetHand, (WORD*)"\x73\x3D"));
+	knownPackets.push_front(new Packet(ClientChat, (WORD*)"\x23\x2A"));
 
 	knownPackets.push_front(new Packet(ServerOk, (WORD*)"\x52\x48"));
 }
@@ -80,59 +81,114 @@ re:
 						const SetHandPacketHandler handler(buffer);
 						buffer += sizeof(SetHandPacket);
 						std::cout << "ClientSetHand: " << ((int)handler.packet->slot) << std::endl;
-						break;
+						goto unknwn;
 					}
 				case ClientPosition:
 					{
-						std::cout << "ClientPosition" << std::endl;
+						//std::cout << "ClientPosition" << std::endl;
 						buffer += 1000;
-						break;
+						goto unknwn;
 					}
 				case ClientJump:
 					{
-						std::cout << "ClientJump" << std::endl;
-						buffer += 1000;
-						break;
+						const JumpPacketHandler handler(buffer);
+						buffer += sizeof(JumpPacket);
+						std::cout << "ClientJump: " << ((int)handler.packet->inAir) << std::endl;
+
+						/*for (int i = 0; i < size-2; i++)
+						{
+							printf("%02X ", (BYTE)*buffer);
+							buffer += 1;
+						}
+						std::cout << std::endl;
+						buffer += 1000;*/
+						goto unknwn;
 					}
-				case ClientFireball:
+				case ClientShoot:
 					{
-						std::cout << "ClientFireball" << std::endl;
-						buffer += 1000;
-						break;
+						const ShootPacketHandler handler(buffer);
+						int nameLength = (int)handler.packet->length;
+						buffer += 2;
+						std::cout << "ClientShoot" << std::endl;
+
+						for (int i = 0; i < nameLength; ++i)
+						{
+							printf("%c", *buffer);
+							buffer += 1;
+						}
+						
+						float yaw = (float)*buffer;
+						buffer += 4;
+						float pitch = (float)*buffer;
+						buffer += 4;
+						float roll = (float)*buffer;
+						buffer += 4;
+
+						printf(" %f %f %f ", yaw, pitch, roll);
+						std::cout << std::endl;
+						
+						goto unknwn;
+					}
+				case ClientChat:
+					{
+						const ChatPacketHandler handler(buffer);
+						int chatLength = (int)handler.packet->length;
+						buffer += 2;
+						std::cout << "ClientChat: ";
+						for (int i = 0; i < chatLength; ++i)
+						{
+							printf("%c", *buffer);
+							buffer += 1;
+						}
+						printf("\n");
+
+						goto unknwn;
 					}
 				case ServerOk:
 					{
-						std::cout << "ServerOk" << std::endl;
+						//std::cout << "ServerOk" << std::endl;
 						buffer += 1000;
-						break;
+						goto unknwn;
 					}
 				case ServerSetHandAck1:
 					{
 						std::cout << "ServerSetHandAck1" << std::endl;
 						buffer += 1000;
-						break;
+						goto unknwn;
 					}
 				case ServerSetHandAck2:
 					{
 						std::cout << "ServerSetHandAck2" << std::endl;
 						buffer += 1000;
-						break;
+						goto unknwn;
 					}
 				default:
 					std::cout << "Unimplemented packet" << std::endl;
 					buffer += 1000;
-					break;
+					goto unknwn;
 				}
 			}
 		}
+
+	unknwn:
+
 		int todo = size - (buffer - realBuffer);
 
 		if (todo > 0)
 		{
+			for (auto knownPacket : knownPackets)
+			{
+				if (*knownPacket->id == *((WORD*)buffer))
+				{
+					goto start;
+				}
+			}
+
 			if (!silent)
 			{
 				if (type == MASTER)
 				{
+					return;
 					printf("[Master]");
 				}
 				else
@@ -148,24 +204,23 @@ re:
 				{
 					printf(" --> ");
 				}
-			}
 
-
-			for (int i = 0; i < todo; ++i)
-			{
-				/*for (auto knownPacket : knownPackets)
+				for (int i = 0; i < todo; ++i)
 				{
-					if (*knownPacket->id == *((WORD*)buffer))
+					for (auto knownPacket : knownPackets)
 					{
-						printf("\n");
-						goto start;
+						if (*knownPacket->id == *((WORD*)buffer))
+						{
+							printf("\n");
+							goto start;
+						}
 					}
-				}*/
 
-				printf("%02X ", (BYTE)buffer[i]);
-				buffer += 1;
+					printf("%02X ", (BYTE)*buffer);
+					buffer += 1;
+				}
+				printf("\n");
 			}
-			printf("\n");
 		}
 
 

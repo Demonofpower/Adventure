@@ -5,8 +5,9 @@ enum PacketType
 {
 	ClientPosition,
 	ClientJump,
-	ClientFireball,
+	ClientShoot,
 	ClientSetHand,
+	ClientChat,
 	ServerOk,
 	ServerSetHandAck1,
 	ServerSetHandAck2
@@ -15,6 +16,25 @@ enum PacketType
 struct SetHandPacket
 {
 	BYTE slot;
+};
+struct JumpPacket
+{
+	bool inAir;
+};
+struct ChatPacket
+{
+	BYTE length;
+	BYTE _null;
+	char msg;
+};
+struct ShootPacket
+{
+	BYTE length;
+	BYTE _null;
+	char* weaponName;
+	float yaw;
+	float pitch;
+	float roll;
 };
 
 class Packet
@@ -50,4 +70,37 @@ public:
 	{
 		packet = (SetHandPacket*) buffer;
 	}
+};
+
+class JumpPacketHandler : RealPacket
+{
+public:
+	struct JumpPacket* packet;
+
+	JumpPacketHandler(char* buffer) : RealPacket(ClientJump, (WORD*)"\x6A\x70", buffer)
+	{
+		packet = (JumpPacket*)buffer;
+	}
+};
+
+class ChatPacketHandler : RealPacket
+{
+public:
+	struct ChatPacket* packet;
+
+	ChatPacketHandler(char* buffer) : RealPacket(ClientChat, (WORD*)"\x23\x2A", buffer)
+	{
+		packet = (ChatPacket*)buffer;
+	}
+};
+
+class ShootPacketHandler : RealPacket
+{
+public:
+	struct ShootPacket* packet;
+
+	ShootPacketHandler(char* buffer) : RealPacket(ClientChat, (WORD*)"\x2A\x69", buffer)
+	{
+		packet = (ShootPacket*)buffer;
+	}	
 };

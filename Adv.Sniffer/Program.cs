@@ -15,6 +15,8 @@ namespace Adv.Sniffer
 
             master.Start();
             game.Start();
+
+            Console.ReadLine();
         }
     }
 }
