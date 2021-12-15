@@ -10,7 +10,60 @@ enum PacketType
 	ClientChat,
 	ServerOk,
 	ServerSetHandAck1,
-	ServerSetHandAck2
+	ServerSetHandAck2,
+	ServerManaUpdate,
+
+	OnNPCConversationStateEvent,
+	OnPlayerPositionEvent,
+	OnRemoveItemEvent,
+	OnActorSpawnEvent,
+	OnReloadEvent,
+	OnRespawnOtherPlayerEvent,
+	OnAddItemEvent,
+	OnRemoteReloadEvent,
+	OnTeleportEvent,
+	OnStartQuestEvent,
+	OnTriggerEvent,
+	OnPickedUpEvent,
+	OnRelativeTeleportEvent,
+	OnPositionAndVelocityEvent,
+	OnRespawnThisPlayerEvent,
+	OnStateEvent,
+	OnPvpEnableEvent,
+	OnDisplayEvent,
+	OnPositionEvent,
+	OnActorDestroyEvent,
+	OnPlayerItemEvent,
+	OnCurrentSlotEvent,
+	OnEquipItemEvent,
+	OnCircuitOutputEvent,
+	OnKillEvent,
+	OnSetCurrentQuestEvent,
+	OnHealthUpdateEvent,
+	OnChatEvent,
+	OnFireBulletsEvent,
+	OnNPCShopEvent,
+	OnPvPCountdownUpdateEvent,
+	OnPlayerLeftEvent,
+	OnPlayerJoinedEvent,
+	OnManaUpdateEvent,
+	OnAdvanceQuestToStateEvent,
+	OnLoadedAmmoEvent,
+	OnLastHitByItemEvent,
+	OnCountdownUpdateEvent,
+	OnNPCConversationEndEvent,
+	OnRegionChangeEvent,
+	Use,
+	TransitionToNPCState,
+	BuyItem,
+	Activate,
+	FireRequest,
+	SellItem,
+	Teleport,
+	Sprint,
+	Jump,
+	FastTravel,
+	SubmitDLCKey
 };
 
 struct SetHandPacket
@@ -35,6 +88,11 @@ struct ShootPacket
 	float yaw;
 	float pitch;
 	float roll;
+};
+
+struct ManaUpdatePacket
+{
+	short _unknwn;
 };
 
 class Packet
@@ -99,8 +157,20 @@ class ShootPacketHandler : RealPacket
 public:
 	struct ShootPacket* packet;
 
-	ShootPacketHandler(char* buffer) : RealPacket(ClientChat, (WORD*)"\x2A\x69", buffer)
+	ShootPacketHandler(char* buffer) : RealPacket(ClientShoot, (WORD*)"\x2A\x69", buffer)
 	{
 		packet = (ShootPacket*)buffer;
 	}	
+};
+
+class ManaUpdatePacketHandler : RealPacket
+{
+public:
+	struct ManaUpdatePacket* packet;
+
+	ManaUpdatePacketHandler(char* buffer) : RealPacket(ServerManaUpdate, (WORD*)"\x7D\x0A", buffer)
+	{
+		packet = (ManaUpdatePacket*)buffer;
+	}
+	
 };

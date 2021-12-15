@@ -42,6 +42,9 @@
     <ClInclude Include="HexArithmetic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PacketChecker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -64,6 +67,9 @@
     </ClCompile>
     <ClCompile Include="HexArithmetic.cpp">
       <Filter>Source Files\Packet</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketChecker.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

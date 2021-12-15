@@ -51,6 +51,32 @@ Type HandleSocket(SOCKET socket)
 	}
 }
 
+void DebugPrint(char* buffer, Type t, int sr)
+{
+	if (t == MASTER)
+	{
+		return;
+	}
+
+	if (*((WORD*)buffer) == *(WORD*)"\x6D\x76")
+	{
+		return;
+	}
+	if (*((WORD*)buffer) == *(WORD*)"\x52\x48")
+	{
+		return;
+	}
+
+	if (sr == 1)
+	{
+		printf("S ");
+	}
+	else
+	{
+		printf("R ");
+	}
+}
+
 typedef int (__stdcall* sendFunc)(SOCKET socket, char* buffer, int len, int flags);
 sendFunc hSendFunc;
 
@@ -58,8 +84,10 @@ int __stdcall SendFunc(SOCKET socket, char* buffer, int len, int flags)
 {
 	Type currType = HandleSocket(socket);
 
+	DebugPrint(buffer, currType, 1);
+
 	reverser.Print(buffer, len, SEND, currType);
-		
+
 	return hSendFunc(socket, buffer, len, flags);
 }
 
@@ -70,8 +98,10 @@ int __stdcall RecvFunc(SOCKET socket, char* buffer, int len, int flags)
 {
 	Type currType = HandleSocket(socket);
 
+	DebugPrint(buffer, currType, 2);
+
 	reverser.Print(buffer, len, RECV, currType);
-	
+
 	return hRecvFunc(socket, buffer, len, flags);
 }
 
@@ -124,12 +154,12 @@ DWORD WINAPI HackThread(HMODULE hModule)
 		Sleep(10);
 	}
 
-	if(socketHooksEnabled)
+	if (socketHooksEnabled)
 	{
 		sendHook.Disable();
 		recvHook.Disable();
 	}
-	
+
 	fclose(f);
 	FreeConsole();
 	FreeLibraryAndExitThread(hModule, 0);

@@ -49,6 +49,7 @@ PacketReverser::PacketReverser()
 	knownPackets.push_front(new Packet(ClientSetHand, (WORD*)"\x73\x3D"));
 	knownPackets.push_front(new Packet(ClientChat, (WORD*)"\x23\x2A"));
 
+	knownPackets.push_front(new Packet(ServerManaUpdate, (WORD*)"\x7D\x0A"));
 	knownPackets.push_front(new Packet(ServerOk, (WORD*)"\x52\x48"));
 }
 
@@ -116,7 +117,7 @@ re:
 							printf("%c", *buffer);
 							buffer += 1;
 						}
-						
+
 						float yaw = (float)*buffer;
 						buffer += 4;
 						float pitch = (float)*buffer;
@@ -126,7 +127,7 @@ re:
 
 						printf(" %f %f %f ", yaw, pitch, roll);
 						std::cout << std::endl;
-						
+
 						goto unknwn;
 					}
 				case ClientChat:
@@ -161,6 +162,13 @@ re:
 						std::cout << "ServerSetHandAck2" << std::endl;
 						buffer += 1000;
 						goto unknwn;
+					}
+				case ServerManaUpdate:
+					{
+						const ManaUpdatePacketHandler handler(buffer);
+						std::cout << "Mana update got" << std::endl;;
+						buffer += sizeof(ManaUpdatePacket);
+						break;
 					}
 				default:
 					std::cout << "Unimplemented packet" << std::endl;
