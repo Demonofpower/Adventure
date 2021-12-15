@@ -106,6 +106,8 @@ public:
 		this->type = type;
 		this->id = id;
 	}
+
+	std::string GetPackeName();
 };
 
 class RealPacket : Packet

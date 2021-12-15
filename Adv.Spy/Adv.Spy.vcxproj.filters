@@ -69,7 +69,7 @@
       <Filter>Source Files\Packet</Filter>
     </ClCompile>
     <ClCompile Include="PacketChecker.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Packet</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -2,6 +2,7 @@
 #include "PacketChecker.h"
 
 #include "Packet.h"
+#include <iostream>
 
 namespace PacketChecker
 {
@@ -66,5 +67,65 @@ namespace PacketChecker
 
 	void Check(char* buffer, int size, Direction dir, Type type)
 	{
+		if (type == MASTER)
+		{
+			return;
+		}
+
+		if(*((WORD*)buffer) == *(WORD*)"\x6d\x76")
+		{
+			return;
+		}
+		if (*((WORD*)buffer) == *(WORD*)"\x52\x48")
+		{
+			return;
+		}
+		
+		auto knownPackets = GetPackedIds();
+
+		if (type == MASTER)
+		{
+			return;
+			printf("[Master]");
+		}
+		else
+		{
+			printf("[Game]");
+		}
+
+		if (dir == SEND)
+		{
+			printf(" <-- ");
+		}
+		else
+		{
+			printf(" --> ");
+		}
+
+		for (auto knownPacket : knownPackets)
+		{
+			if (*knownPacket->id == *((WORD*)buffer))
+			{
+				std::cout << knownPacket->GetPackeName() << "  ";
+
+				for (int i = 0; i < 2; ++i)
+				{
+					printf("%02X ", (BYTE)*buffer);
+					buffer += 1;
+				}
+				printf("\n");
+				return;
+			}
+		}
+
+		std::cout << "UNKNOWN ";
+
+		for (int i = 0; i < 2; ++i)
+		{
+			printf("%02X ", (BYTE)*buffer);
+			buffer += 1;
+		}
+
+		printf("\n");
 	}
 }

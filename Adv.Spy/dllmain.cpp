@@ -11,6 +11,8 @@
 #include <vector>
 
 
+
+#include "PacketChecker.h"
 #include "PacketReverser.h"
 #include "TrampolineHook.h"
 
@@ -84,9 +86,11 @@ int __stdcall SendFunc(SOCKET socket, char* buffer, int len, int flags)
 {
 	Type currType = HandleSocket(socket);
 
-	DebugPrint(buffer, currType, 1);
+	PacketChecker::Check(buffer, len, SEND, currType);
+	
+	/*DebugPrint(buffer, currType, 1);
 
-	reverser.Print(buffer, len, SEND, currType);
+	reverser.Print(buffer, len, SEND, currType);*/
 
 	return hSendFunc(socket, buffer, len, flags);
 }
@@ -98,9 +102,11 @@ int __stdcall RecvFunc(SOCKET socket, char* buffer, int len, int flags)
 {
 	Type currType = HandleSocket(socket);
 
-	DebugPrint(buffer, currType, 2);
+	PacketChecker::Check(buffer, len, RECV, currType);
+	
+	/*DebugPrint(buffer, currType, 2);
 
-	reverser.Print(buffer, len, RECV, currType);
+	reverser.Print(buffer, len, RECV, currType);*/
 
 	return hRecvFunc(socket, buffer, len, flags);
 }
