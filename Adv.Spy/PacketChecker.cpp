@@ -67,12 +67,7 @@ namespace PacketChecker
 
 	void Check(char* buffer, int size, Direction dir, Type type)
 	{
-		if (type == MASTER)
-		{
-			//return;
-		}
-
-		if(*((WORD*)buffer) == *(WORD*)"\x6d\x76")
+		if (*((WORD*)buffer) == *(WORD*)"\x6d\x76")
 		{
 			return;
 		}
@@ -80,7 +75,7 @@ namespace PacketChecker
 		{
 			return;
 		}
-		
+
 		auto knownPackets = GetPackedIds();
 
 		if (type == MASTER)
@@ -101,30 +96,32 @@ namespace PacketChecker
 			printf(" --> ");
 		}
 
-		/*for (auto knownPacket : knownPackets)
+		for (auto knownPacket : knownPackets)
 		{
-			if (*knownPacket->id == *((WORD*)buffer))
+			if (type == GAME)
 			{
-				std::cout << knownPacket->GetPackeName() << "  ";
-
-				for (int i = 0; i < 2; ++i)
+				if (*knownPacket->id == *((WORD*)buffer))
 				{
-					printf("%02X ", (BYTE)*buffer);
-					buffer += 1;
+					std::cout << knownPacket->GetPackeName() << "  ";
+
+					for (int i = 0; i < 2; ++i)
+					{
+						printf("%02X ", (BYTE)*buffer);
+						buffer += 1;
+					}
+					printf("\n");
+					return;
 				}
-				printf("\n");
-				return;
 			}
-		}*/
+			else
+			{
+				
+			}
+		}
 
 		std::cout << "UNKNOWN ";
 
-		/*for (int i = 0; i < 2; ++i)
-		{
-			printf("%02X ", (BYTE)*buffer);
-			buffer += 1;
-		}*/
-		for (int i = 0; i < size; ++i)
+		for (int i = 0; i < 2; ++i)
 		{
 			printf("%02X ", (BYTE)*buffer);
 			buffer += 1;

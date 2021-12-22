@@ -63,7 +63,29 @@ enum PacketType
 	Sprint,
 	Jump,
 	FastTravel,
-	SubmitDLCKey
+	SubmitDLCKey,
+
+	Login,
+	Register,
+	GetPlayerCounts,
+	GetTeammates,
+	CharacterList,
+	CreateCharacter,
+	DeleteCharacter,
+	JoinGameServer,
+	ValidateCharacterToken,
+	AddServerToPool,
+	CharacterRegionChange,
+	StartQuest,
+	UpdateQuest,
+	CompleteQuest,
+	SetActiveQuest,
+	UpdateItems,
+	MarkAsPickedUp,
+	GetFlag,
+	SubmitFlag,
+	SubmitAnswer,
+	END,
 };
 
 struct SetHandPacket

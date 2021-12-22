@@ -109,6 +109,27 @@ std::string Packet::GetPackeName()
 	case Jump: return "Jump";
 	case FastTravel: return "FastTravel";
 	case SubmitDLCKey: return "SubmitDLCKey";
+	case Login: return "Login";
+	case Register: return "Register";
+	case GetPlayerCounts: return "GetPlayerCounts";
+	case GetTeammates: return "GetTeammates";
+	case CharacterList: return "CharacterList";
+	case CreateCharacter: return "CreateCharacter";
+	case DeleteCharacter: return "DeleteCharacter";
+	case JoinGameServer: return "JoinGameServer";
+	case ValidateCharacterToken: return "ValidateCharacterToken";
+	case AddServerToPool: return "AddServerToPool";
+	case CharacterRegionChange: return "CharacterRegionChange";
+	case StartQuest: return "StartQuest";
+	case UpdateQuest: return "UpdateQuest";
+	case CompleteQuest: return "CompleteQuest";
+	case SetActiveQuest: return "SetActiveQuest";
+	case UpdateItems: return "UpdateItems";
+	case MarkAsPickedUp: return "MarkAsPickedUp";
+	case GetFlag: return "GetFlag";
+	case SubmitFlag: return "SubmitFlag";
+	case SubmitAnswer: return "SubmitAnswer";
+	case END: return "END";
 	default: return "UNKNOWN TYPE!";
 	}
 }
