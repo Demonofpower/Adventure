@@ -11,13 +11,14 @@
 #include <vector>
 
 
-
 #include "PacketChecker.h"
 #include "PacketReverser.h"
 #include "TrampolineHook.h"
 
 uintptr_t moduleBase = (uintptr_t)GetModuleHandle(L"PwnAdventure3-Win32-Shipping.exe");
+uintptr_t logicBase = (uintptr_t)GetModuleHandle(L"GameLogic.dll");
 uintptr_t ws2_32_moduleBase = (uintptr_t)GetModuleHandle(L"WS2_32.DLL");
+uintptr_t ssleay32_moduleBase = (uintptr_t)GetModuleHandle(L"SSLEAY32.DLL");
 
 PacketReverser reverser;
 
@@ -85,8 +86,11 @@ sendFunc hSendFunc;
 int __stdcall SendFunc(SOCKET socket, char* buffer, int len, int flags)
 {
 	Type currType = HandleSocket(socket);
-
-	PacketChecker::Check(buffer, len, SEND, currType);
+	
+	if (currType != MASTER)
+	{
+		PacketChecker::Check(buffer, len, SEND, currType);
+	}
 	
 	/*DebugPrint(buffer, currType, 1);
 
@@ -102,13 +106,37 @@ int __stdcall RecvFunc(SOCKET socket, char* buffer, int len, int flags)
 {
 	Type currType = HandleSocket(socket);
 
-	PacketChecker::Check(buffer, len, RECV, currType);
+	if (currType != MASTER)
+	{
+		PacketChecker::Check(buffer, len, RECV, currType);
+	}
 	
 	/*DebugPrint(buffer, currType, 2);
 
 	reverser.Print(buffer, len, RECV, currType);*/
 
 	return hRecvFunc(socket, buffer, len, flags);
+}
+
+typedef int (__cdecl* sslReadFunc)(void* ssl, void* buf, int num);
+sslReadFunc hSslReadFunc;
+
+int __cdecl SslReadFunc(void* ssl, void* buf, int num)
+{
+	int result = hSslReadFunc(ssl, buf, num);
+
+	PacketChecker::Check((char*) buf, num, RECV, MASTER);
+	
+	return result;
+}
+
+typedef int(__cdecl* sslWriteFunc)(void* ssl, void* buf, int num);
+sslReadFunc hSslWriteFunc;
+
+int __cdecl SslWriteFunc(void* ssl, void* buf, int num)
+{
+	PacketChecker::Check((char*)buf, num, SEND, MASTER);
+	return hSslWriteFunc(ssl, buf, num);
 }
 
 DWORD WINAPI HackThread(HMODULE hModule)
@@ -131,6 +159,12 @@ DWORD WINAPI HackThread(HMODULE hModule)
 	TrampolineHook sendHook((BYTE**)&hSendFunc, (BYTE*)SendFunc, 5);
 	hRecvFunc = (recvFunc)(GetProcAddress(GetModuleHandleA("ws2_32.dll"), "recv"));
 	TrampolineHook recvHook((BYTE**)&hRecvFunc, (BYTE*)RecvFunc, 5);
+
+	hSslReadFunc = (sslReadFunc)(GetProcAddress(GetModuleHandleA("ssleay32.dll"), "SSL_read"));
+	TrampolineHook sslReadHook((BYTE**)&hSslReadFunc, (BYTE*)SslReadFunc, 8);
+	hSslWriteFunc = (sslWriteFunc)(GetProcAddress(GetModuleHandleA("ssleay32.dll"), "SSL_write"));
+	TrampolineHook sslWriteHook((BYTE**)&hSslWriteFunc, (BYTE*)SslWriteFunc, 8);
+
 	while (true)
 	{
 		if (GetAsyncKeyState(VK_F1) & 1)
@@ -140,12 +174,16 @@ DWORD WINAPI HackThread(HMODULE hModule)
 				std::cout << "hooked!" << std::endl;
 				sendHook.Enable();
 				recvHook.Enable();
+				sslReadHook.Enable();
+				sslWriteHook.Enable();
 			}
 			else
 			{
 				std::cout << "restored!" << std::endl;;
 				sendHook.Disable();
 				recvHook.Disable();
+				sslReadHook.Disable();
+				sslWriteHook.Disable();
 			}
 			socketHooksEnabled = !socketHooksEnabled;
 		}

@@ -11,8 +11,8 @@ TrampolineHook::TrampolineHook(BYTE** toHook, BYTE* ourFunc, int len)
 	this->ourFunc = ourFunc;
 	this->ourFuncToGateway = toHook;
 	this->len = len;
-
-	Enable();
+	this->hooked = false;
+	this->gateway = nullptr;
 }
 
 void TrampolineHook::Enable()
