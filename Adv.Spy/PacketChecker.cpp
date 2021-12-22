@@ -69,7 +69,7 @@ namespace PacketChecker
 	{
 		if (type == MASTER)
 		{
-			return;
+			//return;
 		}
 
 		if(*((WORD*)buffer) == *(WORD*)"\x6d\x76")
@@ -85,7 +85,6 @@ namespace PacketChecker
 
 		if (type == MASTER)
 		{
-			return;
 			printf("[Master]");
 		}
 		else
@@ -102,7 +101,7 @@ namespace PacketChecker
 			printf(" --> ");
 		}
 
-		for (auto knownPacket : knownPackets)
+		/*for (auto knownPacket : knownPackets)
 		{
 			if (*knownPacket->id == *((WORD*)buffer))
 			{
@@ -116,11 +115,16 @@ namespace PacketChecker
 				printf("\n");
 				return;
 			}
-		}
+		}*/
 
 		std::cout << "UNKNOWN ";
 
-		for (int i = 0; i < 2; ++i)
+		/*for (int i = 0; i < 2; ++i)
+		{
+			printf("%02X ", (BYTE)*buffer);
+			buffer += 1;
+		}*/
+		for (int i = 0; i < size; ++i)
 		{
 			printf("%02X ", (BYTE)*buffer);
 			buffer += 1;
