@@ -125,7 +125,7 @@ int __cdecl SslReadFunc(void* ssl, void* buf, int num)
 {
 	int result = hSslReadFunc(ssl, buf, num);
 
-	PacketChecker::Check((char*) buf, num, RECV, MASTER);
+	PacketChecker::ProcessMasterPacket((char*)buf, num, RECV);
 	
 	return result;
 }
@@ -135,7 +135,7 @@ sslReadFunc hSslWriteFunc;
 
 int __cdecl SslWriteFunc(void* ssl, void* buf, int num)
 {
-	PacketChecker::Check((char*)buf, num, SEND, MASTER);
+	PacketChecker::ProcessMasterPacket((char*)buf, num, SEND);
 	return hSslWriteFunc(ssl, buf, num);
 }
 

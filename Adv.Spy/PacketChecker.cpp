@@ -4,6 +4,8 @@
 #include "Packet.h"
 #include <iostream>
 
+#include "HexArithmetic.h"
+
 namespace PacketChecker
 {
 	std::list<Packet*> GetPackedIds()
@@ -62,11 +64,39 @@ namespace PacketChecker
 		knownPackets.push_front(new Packet(FastTravel, (WORD*)"\x66\x75"));
 		knownPackets.push_front(new Packet(SubmitDLCKey, (WORD*)"\x6b\x79"));
 
+		knownPackets.push_front(new Packet(Login, (WORD*)"\x00\x00"));
+		knownPackets.push_front(new Packet(Register, (WORD*)"\x01\x00"));
+		knownPackets.push_front(new Packet(GetPlayerCounts, (WORD*)"\x02\x00"));
+		knownPackets.push_front(new Packet(GetTeammates, (WORD*)"\x03\x00"));
+		knownPackets.push_front(new Packet(CharacterList, (WORD*)"\x0a\x00"));
+		knownPackets.push_front(new Packet(CreateCharacter, (WORD*)"\x0b\x00"));
+		knownPackets.push_front(new Packet(DeleteCharacter, (WORD*)"\x0c\x00"));
+		knownPackets.push_front(new Packet(JoinGameServer, (WORD*)"\x0d\x00"));
+		knownPackets.push_front(new Packet(ValidateCharacterToken, (WORD*)"\x14\x00"));
+		knownPackets.push_front(new Packet(AddServerToPool, (WORD*)"\x15\x00"));
+		knownPackets.push_front(new Packet(CharacterRegionChange, (WORD*)"\x16\x00"));
+		knownPackets.push_front(new Packet(StartQuest, (WORD*)"\x1e\x00"));
+		knownPackets.push_front(new Packet(UpdateQuest, (WORD*)"\x1f\x00"));
+		knownPackets.push_front(new Packet(CompleteQuest, (WORD*)"\x20\x00"));
+		knownPackets.push_front(new Packet(SetActiveQuest, (WORD*)"\x21\x00"));
+		knownPackets.push_front(new Packet(UpdateItems, (WORD*)"\x5c\x00"));
+		knownPackets.push_front(new Packet(MarkAsPickedUp, (WORD*)"\x23\x00"));
+		knownPackets.push_front(new Packet(GetFlag, (WORD*)"\x28\x00"));
+		knownPackets.push_front(new Packet(SubmitFlag, (WORD*)"\x29\x00"));
+		knownPackets.push_front(new Packet(SubmitAnswer, (WORD*)"\x2a\x00"));
+		knownPackets.push_front(new Packet(END, (WORD*)"\x81\x00"));
+
+
 		return knownPackets;
 	}
 
 	void Check(char* buffer, int size, Direction dir, Type type)
 	{
+		if (type == MASTER)
+		{
+			return;
+		}
+
 		if (*((WORD*)buffer) == *(WORD*)"\x6d\x76")
 		{
 			return;
@@ -113,20 +143,83 @@ namespace PacketChecker
 					return;
 				}
 			}
-			else
-			{
-				
-			}
 		}
 
 		std::cout << "UNKNOWN ";
 
-		for (int i = 0; i < 2; ++i)
+		for (int i = 0; i < size; ++i)
 		{
 			printf("%02X ", (BYTE)*buffer);
 			buffer += 1;
 		}
 
 		printf("\n");
+	}
+
+	PacketType GetNewPacketType(char* buffer)
+	{
+		auto knownPackets = GetPackedIds();
+		for (auto knownPacket : knownPackets)
+		{
+			if (*(char*)knownPacket->id == *buffer)
+			{
+				return knownPacket->type;
+			}
+		}
+
+		throw;
+	}
+
+	bool startFinished = false;
+	bool hasFullPacket = false;
+	char currPacket[256];
+	int currPacketSize = 0;
+	int currPacketParts = 0;
+	
+	void Reset()
+	{
+		hasFullPacket = false;
+		currPacketSize = 0;
+		currPacketParts = 0;
+	}	
+
+	void ProcessMasterPacket(char* buffer, int size, Direction dir)
+	{
+		strncpy(&currPacket[currPacketSize], buffer, size);
+		currPacketSize += size;
+		currPacketParts += 1;
+		
+		if (!startFinished)
+		{
+			if(currPacketParts < 6)
+			{
+				return;
+			}
+			
+			ProcessStartPacket(&currPacket[0]);
+			startFinished = true;
+			Reset();
+			return;
+		}
+	
+	}
+
+	void ProcessStartPacket(char* buffer)
+	{
+		printf("Welcome pwn3: ");
+		auto welcome = Hex::Read32(&buffer);
+		std::cout << welcome << std::endl;
+
+		printf("Version: ");
+		auto version = Hex::Read16(&buffer);
+		std::cout << version << std::endl;
+
+		printf("LoginTitle: ");
+		auto title = Hex::ReadString(&buffer);
+		std::cout << title << std::endl;
+
+		printf("LoginText: ");
+		auto text = Hex::ReadString(&buffer);
+		std::cout << text << std::endl;
 	}
 }
