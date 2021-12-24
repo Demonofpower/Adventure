@@ -85,6 +85,7 @@ enum PacketType
 	GetFlag,
 	SubmitFlag,
 	SubmitAnswer,
+	NoAction,
 	END,
 };
 

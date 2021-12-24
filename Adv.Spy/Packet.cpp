@@ -129,6 +129,7 @@ std::string Packet::GetPackeName()
 	case GetFlag: return "GetFlag";
 	case SubmitFlag: return "SubmitFlag";
 	case SubmitAnswer: return "SubmitAnswer";
+	case NoAction: return "NoAction";
 	case END: return "END";
 	default: return "UNKNOWN TYPE!";
 	}

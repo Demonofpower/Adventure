@@ -19,4 +19,5 @@ namespace PacketChecker
 	void Reset();
 	void ProcessMasterPacket(char* buffer, int size, Direction dir);
 	void ProcessStartPacket(char* packet);
+	void ProcessLoginPacket(char* packet);
 }

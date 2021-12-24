@@ -84,6 +84,7 @@ namespace PacketChecker
 		knownPackets.push_front(new Packet(GetFlag, (WORD*)"\x28\x00"));
 		knownPackets.push_front(new Packet(SubmitFlag, (WORD*)"\x29\x00"));
 		knownPackets.push_front(new Packet(SubmitAnswer, (WORD*)"\x2a\x00"));
+		knownPackets.push_front(new Packet(NoAction, (WORD*)"\x80\x00"));
 		knownPackets.push_front(new Packet(END, (WORD*)"\x81\x00"));
 
 
@@ -175,33 +176,87 @@ namespace PacketChecker
 	char currPacket[256];
 	int currPacketSize = 0;
 	int currPacketParts = 0;
-	
+	PacketType currPacketType;
+
 	void Reset()
 	{
 		hasFullPacket = false;
 		currPacketSize = 0;
 		currPacketParts = 0;
-	}	
+	}
 
 	void ProcessMasterPacket(char* buffer, int size, Direction dir)
 	{
-		strncpy(&currPacket[currPacketSize], buffer, size);
+		memcpy(&currPacket[currPacketSize], buffer, size);
 		currPacketSize += size;
 		currPacketParts += 1;
+
+		printf("%i   ", currPacketParts);
+		for (int i = 0; i < size; ++i)
+		{
+			printf("%02X ", (BYTE)*buffer);
+			buffer += 1;
+		}
+		buffer -= size;
+		printf("\n");
 		
 		if (!startFinished)
 		{
-			if(currPacketParts < 6)
+			if (currPacketParts < 6)
 			{
 				return;
 			}
-			
+
 			ProcessStartPacket(&currPacket[0]);
 			startFinished = true;
 			Reset();
 			return;
 		}
-	
+
+		if (currPacketParts == 1)
+		{
+			currPacketType = GetNewPacketType(buffer);
+		}
+
+		switch (currPacketType)
+		{
+		case Login:
+			{
+				if (currPacketParts == 8)
+				{
+					ProcessLoginPacket(&currPacket[0]);
+					Reset();
+				}
+				break;
+			}
+		case Register: break;
+		case GetPlayerCounts: break;
+		case GetTeammates: break;
+		case CharacterList: break;
+		case CreateCharacter: break;
+		case DeleteCharacter: break;
+		case JoinGameServer: break;
+		case ValidateCharacterToken: break;
+		case AddServerToPool: break;
+		case CharacterRegionChange: break;
+		case StartQuest: break;
+		case UpdateQuest: break;
+		case CompleteQuest: break;
+		case SetActiveQuest: break;
+		case UpdateItems: break;
+		case MarkAsPickedUp: break;
+		case GetFlag: break;
+		case SubmitFlag: break;
+		case SubmitAnswer: break;
+		case NoAction:
+			{
+			printf("80!!!!\n");
+				Reset();
+				break;
+			}
+		case END: break;
+		default: throw;
+		}
 	}
 
 	void ProcessStartPacket(char* buffer)
@@ -221,5 +276,39 @@ namespace PacketChecker
 		printf("LoginText: ");
 		auto text = Hex::ReadString(&buffer);
 		std::cout << text << std::endl;
+	}
+
+	void ProcessLoginPacket(char* buffer)
+	{
+		printf("Login\n");
+		buffer += 1;
+		
+		printf("Username: ");
+		auto user = Hex::ReadString(&buffer);
+		std::cout << user << std::endl;
+
+		printf("Password: ");
+		auto pw = Hex::ReadString(&buffer);
+		std::cout << pw << std::endl;
+
+		printf("Result: ");
+		auto result = Hex::Read8(&buffer);
+		std::cout << result << std::endl;
+		
+		printf("Id: ");
+		auto id = Hex::Read32(&buffer);
+		std::cout << id << std::endl;
+
+		printf("TeamHash: ");
+		auto teamHash = Hex::ReadString(&buffer);
+		std::cout << teamHash << std::endl;
+
+		printf("TeamName: ");
+		auto teamName = Hex::ReadString(&buffer);
+		std::cout << teamName << std::endl;
+
+		printf("IsAdmin: ");
+		auto isAdmin = Hex::Read8(&buffer);
+		std::cout << isAdmin << std::endl;
 	}
 }
