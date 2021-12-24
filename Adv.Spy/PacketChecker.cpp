@@ -178,6 +178,8 @@ namespace PacketChecker
 	int currPacketParts = 0;
 	PacketType currPacketType;
 
+	int characterListCharCount = 99;
+
 	void Reset()
 	{
 		hasFullPacket = false;
@@ -199,7 +201,7 @@ namespace PacketChecker
 		}
 		buffer -= size;
 		printf("\n");
-		
+
 		if (!startFinished)
 		{
 			if (currPacketParts < 6)
@@ -232,7 +234,20 @@ namespace PacketChecker
 		case Register: break;
 		case GetPlayerCounts: break;
 		case GetTeammates: break;
-		case CharacterList: break;
+		case CharacterList:
+			{
+				if (currPacketParts == 2)
+				{
+					characterListCharCount = Hex::Read16(&buffer);
+					buffer -= 2;
+				}
+				if (currPacketParts == 2 + characterListCharCount * 12)
+				{
+					ProcessCharacterListPacket(&currPacket[0]);
+					Reset();
+				}
+				break;
+			}
 		case CreateCharacter: break;
 		case DeleteCharacter: break;
 		case JoinGameServer: break;
@@ -250,7 +265,6 @@ namespace PacketChecker
 		case SubmitAnswer: break;
 		case NoAction:
 			{
-			printf("80!!!!\n");
 				Reset();
 				break;
 			}
@@ -282,7 +296,7 @@ namespace PacketChecker
 	{
 		printf("Login\n");
 		buffer += 1;
-		
+
 		printf("Username: ");
 		auto user = Hex::ReadString(&buffer);
 		std::cout << user << std::endl;
@@ -294,7 +308,7 @@ namespace PacketChecker
 		printf("Result: ");
 		auto result = Hex::Read8(&buffer);
 		std::cout << result << std::endl;
-		
+
 		printf("Id: ");
 		auto id = Hex::Read32(&buffer);
 		std::cout << id << std::endl;
@@ -310,5 +324,58 @@ namespace PacketChecker
 		printf("IsAdmin: ");
 		auto isAdmin = Hex::Read8(&buffer);
 		std::cout << isAdmin << std::endl;
+	}
+
+	void ProcessCharacterListPacket(char* buffer)
+	{
+		printf("CharacterList\n");
+		buffer += 1;
+
+		printf("CharCount: ");
+		auto charCount = Hex::Read16(&buffer);
+		std::cout << charCount << std::endl;
+
+		for (int i = 0; i < charCount; ++i)
+		{
+			printf("CharId: ");
+			auto charId = Hex::Read32(&buffer);
+			std::cout << charId << std::endl;
+
+			printf("CharName: ");
+			auto charName = Hex::ReadString(&buffer);
+			std::cout << charName << std::endl;
+
+			printf("CharLocation: ");
+			auto charLocation = Hex::ReadString(&buffer);
+			std::cout << charLocation << std::endl;
+
+			printf("CharAvatar: ");
+			auto charAvatar = Hex::Read8(&buffer);
+			std::cout << charAvatar << std::endl;
+
+			printf("CharColor1: ");
+			auto charColor1 = Hex::Read32(&buffer);
+			std::cout << charColor1 << std::endl;
+
+			printf("CharColor2: ");
+			auto charColor2 = Hex::Read32(&buffer);
+			std::cout << charColor2 << std::endl;
+
+			printf("CharColor3: ");
+			auto charColor3 = Hex::Read32(&buffer);
+			std::cout << charColor3 << std::endl;
+
+			printf("CharColor4: ");
+			auto charColor4 = Hex::Read32(&buffer);
+			std::cout << charColor4 << std::endl;
+
+			printf("CharFlags: ");
+			auto charFlags = Hex::Read32(&buffer);
+			std::cout << charFlags << std::endl;
+
+			printf("CharAdmin: ");
+			auto charAdmin = Hex::Read8(&buffer);
+			std::cout << charAdmin << std::endl;
+		}
 	}
 }
