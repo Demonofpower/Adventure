@@ -21,4 +21,5 @@ namespace PacketChecker
 	void ProcessStartPacket(char* packet);
 	void ProcessLoginPacket(char* packet);
 	void ProcessCharacterListPacket(char* buffer);
+	void ProcessGetPlayerCountsPacket(char* buffer);
 }

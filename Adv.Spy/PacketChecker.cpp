@@ -232,7 +232,15 @@ namespace PacketChecker
 				break;
 			}
 		case Register: break;
-		case GetPlayerCounts: break;
+		case GetPlayerCounts:
+			{
+				if(currPacketParts == 3)
+				{
+					ProcessGetPlayerCountsPacket(&currPacket[0]);
+					Reset();
+				}
+				break;
+			}
 		case GetTeammates: break;
 		case CharacterList:
 			{
@@ -377,5 +385,19 @@ namespace PacketChecker
 			auto charAdmin = Hex::Read8(&buffer);
 			std::cout << charAdmin << std::endl;
 		}
+	}
+
+	void ProcessGetPlayerCountsPacket(char* buffer)
+	{
+		printf("GetPlayerCounts\n");
+		buffer += 1;
+
+		printf("TeamCount: ");
+		auto teamCount = Hex::Read32(&buffer);
+		std::cout << teamCount << std::endl;
+
+		printf("TotalCount: ");
+		auto totalCount = Hex::Read32(&buffer);
+		std::cout << totalCount << std::endl;
 	}
 }
