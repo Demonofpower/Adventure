@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using Adv.Server.Master;
 
 namespace Adv.Server
 {
@@ -13,8 +14,12 @@ namespace Adv.Server
     {
         private static X509Certificate serverCertificate = null;
 
+        public static List<User> Users;
+
         public void Start(string certificate)
         {
+            Populate();
+            
             serverCertificate = X509Certificate2.CreateFromSignedFile(certificate);
 
             TcpListener listener = new TcpListener(IPAddress.Any, 3333);
@@ -34,29 +39,14 @@ namespace Adv.Server
             {
                 sslStream.AuthenticateAsServer(serverCertificate, false, true);
 
-                sslStream.ReadTimeout = 5000;   
-                sslStream.WriteTimeout = 5000;
+                sslStream.ReadTimeout = int.MaxValue;   
+                sslStream.WriteTimeout = int.MaxValue;
 
-                var buffer = new List<byte>();
-                byte[] welcome = Encoding.UTF8.GetBytes("PWN3");
-                buffer.AddRange(welcome);
-                
-                buffer.Add(0x05);
-                buffer.Add(0x00);
-
-                buffer.Add(0x3);
-                buffer.Add(0x0);
-                byte[] title = Encoding.UTF8.GetBytes("HaX");
-                buffer.AddRange(title);
-
-                buffer.Add(0x8);
-                buffer.Add(0x0);
-                byte[] msg = Encoding.UTF8.GetBytes("Paranoia");
-                buffer.AddRange(msg);
+                var buffer = MasterConnectionApi.CreateWelcomePacket(5, "Custom Server", "By Paranoia with <3");
 
                 Console.WriteLine("Sending hello message.");
 
-                sslStream.Write(buffer.ToArray());
+                sslStream.Write(buffer);
 
                 Console.WriteLine("Waiting for client message...");
                 string messageData = ReadMessage(sslStream);
@@ -101,6 +91,12 @@ namespace Adv.Server
             } while (bytes != 0);
 
             return messageData.ToString();
+        }
+
+        private void Populate()
+        {
+            Users = new List<User>();
+            Users.Add(new User("1", "j"));
         }
     }
 }
