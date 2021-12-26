@@ -12,7 +12,7 @@ namespace Adv.Server.Master
         public static byte[] CreateWelcomePacket(int version, string title, string text)
         {
             var buffer = new List<byte>();
-            byte[] welcome = Encoding.UTF8.GetBytes("PWN3");
+            byte[] welcome = Encoding.ASCII.GetBytes("PWN3");
             buffer.AddRange(welcome);
 
             buffer.Add((byte) version);
@@ -33,26 +33,29 @@ namespace Adv.Server.Master
             return buffer.ToArray();
         }
 
-        private ClientLoginPacket ProcessClientLoginPacket(byte[] packet)
+        public static ClientLoginPacket ProcessClientLoginPacket(byte[] packet)
         {
             var clientLoginPacket = new ClientLoginPacket(packet.ToList())
             {
-                Id = PacketReader.Read8(packet),
-                Username = PacketReader.ReadString(packet),
-                Password = PacketReader.ReadString(packet)
+                Id = PacketProcessor.Read8(packet),
+                Username = PacketProcessor.ReadString(packet),
+                Password = PacketProcessor.ReadString(packet)
             };
             
             return clientLoginPacket;
         }
-        
-        private byte[] CreateLoginPacket()
+
+        public static byte[] CreateLoginPacket(User user)
         {
             var buffer = new List<byte>();
             
             buffer.Add(0x1);
             
-            buffer.AddRange(BitConverter.GetBytes(1));
-
+            buffer.Write32(user.Id);
+            buffer.WriteString(user.Team.SecretTeamName);
+            buffer.WriteString(user.Team.TeamName);
+            buffer.Write8(user.IsAdmin);
+            
             return buffer.ToArray();
         }
     }

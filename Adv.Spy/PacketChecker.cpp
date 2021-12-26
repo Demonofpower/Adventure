@@ -313,6 +313,7 @@ namespace PacketChecker
 		auto pw = Hex::ReadString(&buffer);
 		std::cout << pw << std::endl;
 
+		
 		printf("Result: ");
 		auto result = Hex::Read8(&buffer);
 		std::cout << result << std::endl;

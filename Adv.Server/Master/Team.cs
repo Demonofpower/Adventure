@@ -8,5 +8,11 @@ namespace Adv.Server.Master
     {
         public string TeamName { get; set; }
         public string SecretTeamName { get; set; }
+
+        public Team(string teamName, string secretTeamName)
+        {
+            TeamName = teamName;
+            SecretTeamName = secretTeamName;
+        }
     }
 }

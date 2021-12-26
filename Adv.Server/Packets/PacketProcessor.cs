@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Adv.Server.Packets
 {
-    public static class PacketReader
+    public static class PacketProcessor
     {
         public static byte Read8(IList<byte> packet)
         {
@@ -44,12 +44,47 @@ namespace Adv.Server.Packets
             return str;
         }
 
+        private static void AddRange(this IList<byte> iList, IList<byte> toAdd)
+        {
+            foreach (var b in toAdd)
+            {
+                iList.Add(b);
+            }
+        }
+
         private static void RemoveRange<T>(this IList<T> iList, int start, int size)
         {
             for (int j = start; j < size + start; j++)
             {
                 iList.RemoveAt(j);
             }
+        }
+
+        public static void Write8(this IList<byte> packet, byte val)
+        {
+            packet.Add(val);
+        }
+        public static void Write8(this IList<byte> packet, bool val)
+        {
+            packet.Add(Convert.ToByte(val));
+        }
+
+        public static void Write16(this IList<byte> packet, short val)
+        {
+            packet.AddRange(BitConverter.GetBytes(val));
+        }
+
+        public static void Write32(this IList<byte> packet, int val)
+        {
+            packet.AddRange(BitConverter.GetBytes(val));
+        }
+
+        public static void WriteString(this IList<byte> packet, string val)
+        {
+            packet.Add((byte) val.Length);
+            packet.Add(0x0);
+
+            System.Text.Encoding.ASCII.GetBytes(val);
         }
     }
 }

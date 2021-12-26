@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
@@ -15,11 +16,12 @@ namespace Adv.Server
         private static X509Certificate serverCertificate = null;
 
         public static List<User> Users;
+        public static List<Team> Teams;
 
         public void Start(string certificate)
         {
             Populate();
-            
+
             serverCertificate = X509Certificate2.CreateFromSignedFile(certificate);
 
             TcpListener listener = new TcpListener(IPAddress.Any, 3333);
@@ -39,18 +41,21 @@ namespace Adv.Server
             {
                 sslStream.AuthenticateAsServer(serverCertificate, false, true);
 
-                sslStream.ReadTimeout = int.MaxValue;   
+                sslStream.ReadTimeout = int.MaxValue;
                 sslStream.WriteTimeout = int.MaxValue;
 
                 var buffer = MasterConnectionApi.CreateWelcomePacket(5, "Custom Server", "By Paranoia with <3");
-
                 Console.WriteLine("Sending hello message.");
-
                 sslStream.Write(buffer);
 
-                Console.WriteLine("Waiting for client message...");
-                string messageData = ReadMessage(sslStream);
-                Console.WriteLine("Received: {0}", messageData);
+                while (true)
+                {
+                    List<byte> packet = ReadMessage(sslStream);
+                    var reply = GetNewMessage(packet);
+                    Console.WriteLine("Login attempt got!");
+                    sslStream.Write(reply);
+                    Console.WriteLine("Login reply sent!");
+                }
             }
             catch (AuthenticationException e)
             {
@@ -72,31 +77,32 @@ namespace Adv.Server
             }
         }
 
-        static string ReadMessage(SslStream sslStream)
+        static List<byte> ReadMessage(SslStream sslStream)
         {
             byte[] buffer = new byte[2048];
-            StringBuilder messageData = new StringBuilder();
             int bytes = -1;
             do
             {
                 bytes = sslStream.Read(buffer, 0, buffer.Length);
-                Decoder decoder = Encoding.UTF8.GetDecoder();
-                char[] chars = new char[decoder.GetCharCount(buffer, 0, bytes)];
-                decoder.GetChars(buffer, 0, bytes, chars, 0);
-                messageData.Append(chars);
-                if (messageData.ToString().IndexOf("<EOF>") != -1)
-                {
-                    break;
-                }
             } while (bytes != 0);
 
-            return messageData.ToString();
+            return buffer.ToList();
+        }
+
+        private byte[] GetNewMessage(List<byte> packet)
+        {
+            var clientLoginPacket = MasterConnectionApi.ProcessClientLoginPacket(packet.ToArray());
+
+            return MasterConnectionApi.CreateLoginPacket(Users.FirstOrDefault(u => u.Username == clientLoginPacket.Username && u.Password == clientLoginPacket.Password));
         }
 
         private void Populate()
         {
+            Teams = new List<Team>();
+            Teams.Add(new Team("Dev", "133769420"));
+
             Users = new List<User>();
-            Users.Add(new User("1", "j"));
+            Users.Add(new User("1", "j", 1, Teams[0], true));
         }
     }
 }
