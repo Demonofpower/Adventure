@@ -2,7 +2,7 @@
 
 namespace Adv.Server.Packets.Master
 {
-    class ClientLoginPacket : Packet
+    class ClientLoginPacket : MasterPacket
     {
         public string Username { get; set; }
         public string Password { get; set; }

@@ -8,15 +8,19 @@ using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Adv.Server.Master;
+using Adv.Server.Master.Enums;
+using Adv.Server.Packets.Master;
 
 namespace Adv.Server
 {
     class MasterServer
     {
-        private static X509Certificate serverCertificate = null;
-
         public static List<User> Users;
         public static List<Team> Teams;
+
+        private static X509Certificate serverCertificate = null;
+
+        private Dictionary<TcpClient, User> loggedInUser;
 
         public void Start(string certificate)
         {
@@ -36,13 +40,15 @@ namespace Adv.Server
 
         private void ProcessClient(TcpClient client)
         {
-            SslStream sslStream = new SslStream(client.GetStream(), false);
+            var sslStream = new SslStream(client.GetStream(), false);
             try
             {
                 sslStream.AuthenticateAsServer(serverCertificate, false, true);
 
                 sslStream.ReadTimeout = int.MaxValue;
                 sslStream.WriteTimeout = int.MaxValue;
+
+                loggedInUser.Add(client, null);
 
                 var buffer = MasterConnectionApi.CreateWelcomePacket(5, "Custom Server", "By Paranoia with <3");
                 Console.WriteLine("Sending hello message.");
@@ -51,10 +57,14 @@ namespace Adv.Server
                 while (true)
                 {
                     List<byte> packet = ReadMessage(sslStream);
-                    var reply = GetNewMessage(packet);
-                    Console.WriteLine("Login attempt got!");
+                    var reply = GetNewMessageAndCraftAnswer(packet, client);
+                    Console.WriteLine("Msg got!");
+
+                    if (reply.Length == 0) continue;
+                    if (reply[0] == 0x81) break;
+
                     sslStream.Write(reply);
-                    Console.WriteLine("Login reply sent!");
+                    Console.WriteLine("Msg answer sent!");
                 }
             }
             catch (AuthenticationException e)
@@ -66,9 +76,6 @@ namespace Adv.Server
                 }
 
                 Console.WriteLine("Authentication failed - closing the connection.");
-                sslStream.Close();
-                client.Close();
-                return;
             }
             finally
             {
@@ -77,32 +84,99 @@ namespace Adv.Server
             }
         }
 
-        static List<byte> ReadMessage(SslStream sslStream)
+        private static List<byte> ReadMessage(SslStream sslStream)
         {
             byte[] buffer = new byte[2048];
-            int bytes = -1;
+            int bytes = 0;
             do
             {
                 bytes = sslStream.Read(buffer, 0, buffer.Length);
-            } while (bytes != 0);
+            } while (bytes == 0);
 
             return buffer.ToList();
         }
 
-        private byte[] GetNewMessage(List<byte> packet)
+        private byte[] GetNewMessageAndCraftAnswer(List<byte> packet, TcpClient client)
         {
-            var clientLoginPacket = MasterConnectionApi.ProcessClientLoginPacket(packet.ToArray());
+            var currentUser = GetUserByTcpClient(client);
+            var masterPacketType = Enum.Parse<MasterPacketType>(packet[0].ToString());
 
-            return MasterConnectionApi.CreateLoginPacket(Users.FirstOrDefault(u => u.Username == clientLoginPacket.Username && u.Password == clientLoginPacket.Password));
+            switch (masterPacketType)
+            {
+                case MasterPacketType.Login:
+                    var clientLoginPacket = MasterConnectionApi.ProcessClientLoginPacket(packet.ToArray());
+
+                    loggedInUser[client] = Users.FirstOrDefault(u => u.Username == clientLoginPacket.Username);
+
+                    return MasterConnectionApi.CreateServerLoginPacket(Users.FirstOrDefault(u =>
+                        u.Username == clientLoginPacket.Username && u.Password == clientLoginPacket.Password));
+                case MasterPacketType.Register:
+                    break;
+                case MasterPacketType.GetPlayerCounts:
+                    return MasterConnectionApi.CreateServerPlayerCountPacket();
+                case MasterPacketType.GetTeammates:
+                    break;
+                case MasterPacketType.CharacterList:
+                    return MasterConnectionApi.CreateServerCharacterListPacket(currentUser);
+                case MasterPacketType.CreateCharacter:
+                    break;
+                case MasterPacketType.DeleteCharacter:
+                    break;
+                case MasterPacketType.JoinGameServer:
+                    var clientJoinGameServerPacket = MasterConnectionApi.ProcessClientJoinGameServerPacket(packet.ToArray());
+
+                    return MasterConnectionApi.CreateServerJoinGameServerPacket(currentUser);
+                case MasterPacketType.ValidateCharacterToken:
+                    break;
+                case MasterPacketType.AddServerToPool:
+                    break;
+                case MasterPacketType.CharacterRegionChange:
+                    break;
+                case MasterPacketType.StartQuest:
+                    break;
+                case MasterPacketType.UpdateQuest:
+                    break;
+                case MasterPacketType.CompleteQuest:
+                    break;
+                case MasterPacketType.SetActiveQuest:
+                    break;
+                case MasterPacketType.UpdateItems:
+                    break;
+                case MasterPacketType.MarkAsPickedUp:
+                    break;
+                case MasterPacketType.GetFlag:
+                    break;
+                case MasterPacketType.SubmitFlag:
+                    break;
+                case MasterPacketType.SubmitAnswer:
+                    break;
+                case MasterPacketType.NoAction:
+                    return MasterConnectionApi.CreateServerNoActionPacket();
+                case MasterPacketType.End:
+                    return new byte[] {0x81};
+                default: throw new NotImplementedException();
+            }
+
+            throw new NotImplementedException();
         }
 
         private void Populate()
         {
+            loggedInUser = new Dictionary<TcpClient, User>();
+
             Teams = new List<Team>();
             Teams.Add(new Team("Dev", "133769420"));
 
+            var userCharList = new List<Character>();
+            userCharList.Add(new Character(1, "Juli", Location.TODO, 1, 1, 1, 1, 1, 1, true));
+
             Users = new List<User>();
-            Users.Add(new User("1", "j", 1, Teams[0], true));
+            Users.Add(new User("j", "j", 1, Teams[0], true, userCharList));
+        }
+
+        private User GetUserByTcpClient(TcpClient client)
+        {
+            return loggedInUser[client];
         }
     }
 }

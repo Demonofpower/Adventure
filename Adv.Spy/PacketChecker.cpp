@@ -93,10 +93,10 @@ namespace PacketChecker
 
 	void Check(char* buffer, int size, Direction dir, Type type)
 	{
-		if (type == MASTER)
+		/*if (type == MASTER)
 		{
 			return;
-		}
+		}*/
 
 		if (*((WORD*)buffer) == *(WORD*)"\x6d\x76")
 		{
@@ -127,7 +127,7 @@ namespace PacketChecker
 			printf(" --> ");
 		}
 
-		for (auto knownPacket : knownPackets)
+		/*for (auto knownPacket : knownPackets)
 		{
 			if (type == GAME)
 			{
@@ -146,7 +146,7 @@ namespace PacketChecker
 			}
 		}
 
-		std::cout << "UNKNOWN ";
+		std::cout << "UNKNOWN ";*/
 
 		for (int i = 0; i < size; ++i)
 		{

@@ -6,40 +6,35 @@ namespace Adv.Server.Packets
 {
     public static class PacketProcessor
     {
-        public static byte Read8(IList<byte> packet)
+        public static byte Read8(ref byte[] packet)
         {
             var result = packet[0];
-            packet.RemoveAt(0);
+            packet = packet.Skip(1).ToArray();
 
             return result;
         }
 
-        public static short Read16(IList<byte> packet)
+        public static short Read16(ref byte[] packet)
         {
             var result = BitConverter.ToInt16(packet.ToArray(), 0);
-            packet.RemoveAt(0);
-            packet.RemoveAt(0);
+            packet = packet.Skip(2).ToArray();
 
             return result;
         }
 
-        public static int Read32(IList<byte> packet)
+        public static int Read32(ref byte[] packet)
         {
             var result = BitConverter.ToInt32(packet.ToArray(), 0);
-            packet.RemoveAt(0);
-            packet.RemoveAt(0);
-            packet.RemoveAt(0);
-            packet.RemoveAt(0);
+            packet = packet.Skip(4).ToArray();
 
             return result;
         }
 
-        public static string ReadString(IList<byte> packet)
+        public static string ReadString(ref byte[] packet)
         {
             var size = BitConverter.ToInt16(packet.ToArray(), 0);
             var str = System.Text.Encoding.ASCII.GetString(packet.ToArray(), 2, size);
-
-            packet.RemoveRange(0, size + 2);
+            packet = packet.Skip(size + 2).ToArray();
 
             return str;
         }
@@ -64,6 +59,7 @@ namespace Adv.Server.Packets
         {
             packet.Add(val);
         }
+
         public static void Write8(this IList<byte> packet, bool val)
         {
             packet.Add(Convert.ToByte(val));
@@ -84,7 +80,7 @@ namespace Adv.Server.Packets
             packet.Add((byte) val.Length);
             packet.Add(0x0);
 
-            System.Text.Encoding.ASCII.GetBytes(val);
+            packet.AddRange(System.Text.Encoding.ASCII.GetBytes(val));
         }
     }
 }
