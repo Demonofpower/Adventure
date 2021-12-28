@@ -6,7 +6,6 @@ using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using Adv.Server.Master;
 using Adv.Server.Master.Enums;
 using Adv.Server.Packets.Master;
@@ -22,13 +21,13 @@ namespace Adv.Server
 
         private Dictionary<TcpClient, User> loggedInUser;
 
-        public void Start(string certificate)
+        public void Start(int port, string certificate)
         {
             Populate();
 
             serverCertificate = X509Certificate2.CreateFromSignedFile(certificate);
 
-            TcpListener listener = new TcpListener(IPAddress.Any, 3333);
+            TcpListener listener = new TcpListener(IPAddress.Any, port);
             listener.Start();
             while (true)
             {

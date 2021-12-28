@@ -126,8 +126,8 @@ namespace Adv.Server.Master
             
             //Server available
             buffer.Write8(0x1);
-
-
+            
+            
 
             return buffer.ToArray();
         }
