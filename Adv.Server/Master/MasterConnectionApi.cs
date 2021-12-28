@@ -54,7 +54,7 @@ namespace Adv.Server.Master
         {
             var clientJoinGameServerPacket = new ClientJoinGameServerPacket(packet.ToList())
             {
-                Id = PacketProcessor.Read32(ref packet)
+                CharacterId = PacketProcessor.Read32(ref packet)
             };
 
             return clientJoinGameServerPacket;
@@ -84,7 +84,7 @@ namespace Adv.Server.Master
         public static byte[] CreateServerCharacterListPacket(User user)
         {
             var buffer = new List<byte>();
-            
+
             var charCount = user.Characters.Count;
             buffer.Write16((short) charCount);
 
@@ -108,27 +108,76 @@ namespace Adv.Server.Master
         public static byte[] CreateServerPlayerCountPacket()
         {
             var buffer = new List<byte>();
-            
+
             //TODO!!!
             buffer.Write32(69);
             //TODO!!!
             buffer.Write32(420);
-            
+
             return buffer.ToArray();
         }
 
-        public static byte[] CreateServerJoinGameServerPacket(User user)
+        public static byte[] CreateServerJoinGameServerPacket(User user, Character character)
         {
             var buffer = new List<byte>();
 
             //Success
             buffer.Write8(0x1);
-            
             //Server available
             buffer.Write8(0x1);
-            
-            
+            buffer.WriteString("192.168.178.32");
+            buffer.Write16(3003);
+            //Token TODO!!!
+            buffer.WriteString("token1");
+            buffer.WriteString(character.Name);
+            buffer.WriteString(user.Team.TeamName);
+            buffer.Write8(character.IsAdmin && user.IsAdmin);
 
+            //TODO!!!
+            var quests = MasterServer.Quests;
+            buffer.Write16((short) quests.Count);
+            foreach (var quest in quests)
+            {
+                buffer.WriteString(quest.Name);
+                //Quest state
+                buffer.WriteString("Todo");
+                //unknown count
+                buffer.Write32(1);
+            }
+            
+            //Current quest
+            buffer.WriteString(quests[0].Name);
+            
+            //TODO!!!
+            var items = MasterServer.Items;
+            buffer.Write16((short) items.Count);
+            foreach (var item in items)
+            {
+                buffer.WriteString(item.Name);
+                //Unknown
+                buffer.Write32(1);
+                //Unknown
+                buffer.Write16(1);
+            }
+
+            //TODO!!!
+            foreach (var item in items)
+            {
+                //Unknown maybe weapon name in slot MAYBE in WHILE???
+                buffer.WriteString("unknown");
+            }
+           
+            //Current slot?
+            buffer.Write8(0);
+            
+            //TODO!!
+            var achievements = MasterServer.Achievements;
+            buffer.Write16((short) achievements.Count);
+            foreach (var achievement in achievements)
+            {
+                buffer.WriteString(achievement.Name);
+            }
+            
             return buffer.ToArray();
         }
     }

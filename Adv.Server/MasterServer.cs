@@ -16,6 +16,9 @@ namespace Adv.Server
     {
         public static List<User> Users;
         public static List<Team> Teams;
+        public static List<Quest> Quests;
+        public static List<Item> Items;
+        public static List<Achievement> Achievements;
 
         private static X509Certificate serverCertificate = null;
 
@@ -98,6 +101,7 @@ namespace Adv.Server
         private byte[] GetNewMessageAndCraftAnswer(List<byte> packet, TcpClient client)
         {
             var currentUser = GetUserByTcpClient(client);
+            Character currentCharacter = null;
             var masterPacketType = Enum.Parse<MasterPacketType>(packet[0].ToString());
 
             switch (masterPacketType)
@@ -123,8 +127,9 @@ namespace Adv.Server
                     break;
                 case MasterPacketType.JoinGameServer:
                     var clientJoinGameServerPacket = MasterConnectionApi.ProcessClientJoinGameServerPacket(packet.ToArray());
-
-                    return MasterConnectionApi.CreateServerJoinGameServerPacket(currentUser);
+                    currentCharacter = GetCharacterById(clientJoinGameServerPacket.CharacterId, currentUser);
+                    
+                    return MasterConnectionApi.CreateServerJoinGameServerPacket(currentUser, currentCharacter);
                 case MasterPacketType.ValidateCharacterToken:
                     break;
                 case MasterPacketType.AddServerToPool:
@@ -163,6 +168,12 @@ namespace Adv.Server
         {
             loggedInUser = new Dictionary<TcpClient, User>();
 
+            Quests = new List<Quest>();
+            Quests.Add(new Quest() { Name = "Bears" });
+            
+            Items = new List<Item>();
+            Achievements = new List<Achievement>();
+
             Teams = new List<Team>();
             Teams.Add(new Team("Dev", "133769420"));
 
@@ -176,6 +187,14 @@ namespace Adv.Server
         private User GetUserByTcpClient(TcpClient client)
         {
             return loggedInUser[client];
+        }
+
+        private Character GetCharacterById(int id, User user)
+        {
+            return user.Characters.FirstOrDefault();
+
+            //TODO!!!
+            return user.Characters.FirstOrDefault(c => id == c.Id);
         }
     }
 }
