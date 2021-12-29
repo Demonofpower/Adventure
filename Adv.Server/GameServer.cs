@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
+using System.Numerics;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -11,17 +12,18 @@ using Adv.Server.Game;
 using Adv.Server.Master;
 using Adv.Server.Packets;
 using Adv.Server.Packets.Game;
+using Adv.Server.Util;
 
 namespace Adv.Server
 {
     class GameServer
     {
         private Dictionary<TcpClient, string> sessions;
-        
+
         public void Start(int port)
         {
             Populate();
-            
+
             var listener = new TcpListener(IPAddress.Any, port);
             listener.Start();
             while (true)
@@ -35,7 +37,7 @@ namespace Adv.Server
         private void ProcessClient(TcpClient client)
         {
             sessions.Add(client, null);
-            
+
             var networkStream = client.GetStream();
             try
             {
@@ -54,17 +56,20 @@ namespace Adv.Server
                     {
                         var clientHelloPacket = GameConnectionApi.ProcessClientHelloPacket(packet.ToArray(), client);
 
+                        sessions[client] = clientHelloPacket.SessionId;
+                        
                         //TODO!!
-                        var helloReply = GameConnectionApi.CreateServerHelloPacket();
+                        var helloReply = GameConnectionApi.CreateServerHelloPacket(new Vector3(-54150f, -56283f, 1000), new Rotation(0, 0, 0));
+                        
                         networkStream.Write(helloReply);
                         
                         continue;
                     }
-                    
+
                     var reply = GetNewMessageAndCraftAnswer(packet.ToArray(), client);
                     Console.WriteLine("Msg got!");
 
-                    //if (reply.Length == 0) continue;
+                    if (reply == null || reply.Length == 0) continue;
                     //if (reply[0] == 0x81) break;
 
                     //networkStream.Write(reply);
@@ -101,8 +106,8 @@ namespace Adv.Server
         private byte[] GetNewMessageAndCraftAnswer(byte[] packet, TcpClient client)
         {
             var gamePacketType = Enum.Parse<GamePacketType>(PacketProcessor.Read16(ref packet).ToString());
-            var charToken = PacketProcessor.ReadString(ref packet);
-            
+            //var charToken = PacketProcessor.ReadString(ref packet);
+
             switch (gamePacketType)
             {
                 case GamePacketType.OnNPCConversationStateEvent:
@@ -207,7 +212,9 @@ namespace Adv.Server
                     break;
                 case GamePacketType.SubmitDLCKey:
                     break;
-                default: throw new ArgumentOutOfRangeException();
+                default:
+                    return null;
+                    throw new ArgumentOutOfRangeException();
             }
 
             throw new NotImplementedException();

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
+using Adv.Server.Util;
 
 namespace Adv.Server.Packets
 {
@@ -75,6 +77,11 @@ namespace Adv.Server.Packets
             packet.AddRange(BitConverter.GetBytes(val));
         }
 
+        public static void WriteFloat(this IList<byte> packet, float val)
+        {
+            packet.AddRange(BitConverter.GetBytes(val));
+        }
+
         public static void WriteString(this IList<byte> packet, string val)
         {
             packet.Add((byte) val.Length);
@@ -83,6 +90,20 @@ namespace Adv.Server.Packets
             if (val.Length == 0) return;
 
             packet.AddRange(System.Text.Encoding.ASCII.GetBytes(val));
+        }
+
+        public static void WriteVector3(this IList<byte> packet, Vector3 val)
+        {
+            packet.AddRange(BitConverter.GetBytes(val.X));
+            packet.AddRange(BitConverter.GetBytes(val.Y));
+            packet.AddRange(BitConverter.GetBytes(val.Z));
+        }
+
+        public static void WriteRotation(this IList<byte> packet, Rotation val)
+        {
+            packet.AddRange(BitConverter.GetBytes(val.Yaw));
+            packet.AddRange(BitConverter.GetBytes(val.Pitch));
+            packet.AddRange(BitConverter.GetBytes(val.Roll));
         }
     }
 }

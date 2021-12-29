@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Numerics;
-using System.Text;
 using Adv.Server.Packets;
 using Adv.Server.Packets.Game;
+using Adv.Server.Util;
 
 namespace Adv.Server.Game
 {
@@ -21,10 +20,17 @@ namespace Adv.Server.Game
             return clientHelloPacket;
         }
 
-        public static byte[] CreateServerHelloPacket(Vector3 position, Vector3 rotation)
+        public static byte[] CreateServerHelloPacket(Vector3 position, Rotation rotation)
         {
+            var packet = new List<byte>();
+
+            //TODO!!! id
+            packet.Write32(1);
             
-            return new byte[] { };
+            packet.WriteVector3(position);
+            packet.WriteRotation(rotation);
+            
+            return packet.ToArray();
         }
     }
 }
