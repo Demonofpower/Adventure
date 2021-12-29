@@ -5,16 +5,23 @@ using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using Adv.Server.Game;
 using Adv.Server.Master;
+using Adv.Server.Packets;
 using Adv.Server.Packets.Game;
 
 namespace Adv.Server
 {
     class GameServer
     {
+        private Dictionary<TcpClient, string> sessions;
+        
         public void Start(int port)
         {
+            Populate();
+            
             var listener = new TcpListener(IPAddress.Any, port);
             listener.Start();
             while (true)
@@ -27,6 +34,8 @@ namespace Adv.Server
 
         private void ProcessClient(TcpClient client)
         {
+            sessions.Add(client, null);
+            
             var networkStream = client.GetStream();
             try
             {
@@ -40,7 +49,19 @@ namespace Adv.Server
                 while (true)
                 {
                     List<byte> packet = ReadMessage(networkStream);
-                    var reply = GetNewMessageAndCraftAnswer(packet, client);
+
+                    if (sessions[client] is null)
+                    {
+                        var clientHelloPacket = GameConnectionApi.ProcessClientHelloPacket(packet.ToArray(), client);
+
+                        //TODO!!
+                        var helloReply = GameConnectionApi.CreateServerHelloPacket();
+                        networkStream.Write(helloReply);
+                        
+                        continue;
+                    }
+                    
+                    var reply = GetNewMessageAndCraftAnswer(packet.ToArray(), client);
                     Console.WriteLine("Msg got!");
 
                     //if (reply.Length == 0) continue;
@@ -77,10 +98,11 @@ namespace Adv.Server
             return buffer.ToList();
         }
 
-        private byte[] GetNewMessageAndCraftAnswer(List<byte> packet, TcpClient client)
+        private byte[] GetNewMessageAndCraftAnswer(byte[] packet, TcpClient client)
         {
-            var gamePacketType = Enum.Parse<GamePacketType>(packet[0].ToString());
-
+            var gamePacketType = Enum.Parse<GamePacketType>(PacketProcessor.Read16(ref packet).ToString());
+            var charToken = PacketProcessor.ReadString(ref packet);
+            
             switch (gamePacketType)
             {
                 case GamePacketType.OnNPCConversationStateEvent:
@@ -189,6 +211,11 @@ namespace Adv.Server
             }
 
             throw new NotImplementedException();
+        }
+
+        private void Populate()
+        {
+            sessions = new Dictionary<TcpClient, string>();
         }
     }
 }

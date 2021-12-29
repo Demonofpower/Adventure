@@ -8,7 +8,7 @@ using Adv.Server.Packets.Master;
 
 namespace Adv.Server.Master
 {
-    class MasterConnectionApi
+    static class MasterConnectionApi
     {
         public static MasterPacketType GetMasterPacketType(byte[] buffer)
         {
