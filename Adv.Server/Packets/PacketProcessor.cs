@@ -80,6 +80,8 @@ namespace Adv.Server.Packets
             packet.Add((byte) val.Length);
             packet.Add(0x0);
 
+            if (val.Length == 0) return;
+
             packet.AddRange(System.Text.Encoding.ASCII.GetBytes(val));
         }
     }

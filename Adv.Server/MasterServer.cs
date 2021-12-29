@@ -169,7 +169,7 @@ namespace Adv.Server
             loggedInUser = new Dictionary<TcpClient, User>();
 
             Quests = new List<Quest>();
-            Quests.Add(new Quest() { Name = "Bears" });
+            Quests.Add(new Quest() { Name = "LostCave" });
             
             Items = new List<Item>();
             Achievements = new List<Achievement>();

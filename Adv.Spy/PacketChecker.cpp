@@ -93,10 +93,10 @@ namespace PacketChecker
 
 	void Check(char* buffer, int size, Direction dir, Type type)
 	{
-		/*if (type == MASTER)
+		if (type != MASTER)
 		{
 			return;
-		}*/
+		}
 
 		if (*((WORD*)buffer) == *(WORD*)"\x6d\x76")
 		{

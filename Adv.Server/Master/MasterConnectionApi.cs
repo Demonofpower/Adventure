@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using Adv.Server.Packets;
 using Adv.Server.Packets.Master;
@@ -125,8 +126,11 @@ namespace Adv.Server.Master
             buffer.Write8(0x1);
             //Server available
             buffer.Write8(0x1);
-            buffer.WriteString("192.168.178.32");
+
+            buffer.WriteString("game.pwn3");
+
             buffer.Write16(3003);
+
             //Token TODO!!!
             buffer.WriteString("token1");
             buffer.WriteString(character.Name);
@@ -140,14 +144,14 @@ namespace Adv.Server.Master
             {
                 buffer.WriteString(quest.Name);
                 //Quest state
-                buffer.WriteString("Todo");
+                buffer.WriteString("Initial"); //TODO
                 //unknown count
-                buffer.Write32(1);
+                buffer.Write32(0);
             }
-            
+
             //Current quest
             buffer.WriteString(quests[0].Name);
-            
+
             //TODO!!!
             var items = MasterServer.Items;
             buffer.Write16((short) items.Count);
@@ -160,16 +164,14 @@ namespace Adv.Server.Master
                 buffer.Write16(1);
             }
 
-            //TODO!!!
-            foreach (var item in items)
+            for (int i = 0; i < 10; i++)
             {
-                //Unknown maybe weapon name in slot MAYBE in WHILE???
-                buffer.WriteString("unknown");
+                buffer.WriteString("");
             }
-           
+
             //Current slot?
             buffer.Write8(0);
-            
+
             //TODO!!
             var achievements = MasterServer.Achievements;
             buffer.Write16((short) achievements.Count);
@@ -177,7 +179,7 @@ namespace Adv.Server.Master
             {
                 buffer.WriteString(achievement.Name);
             }
-            
+
             return buffer.ToArray();
         }
     }
