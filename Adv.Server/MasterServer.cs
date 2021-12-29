@@ -86,7 +86,7 @@ namespace Adv.Server
             }
         }
 
-        private static List<byte> ReadMessage(SslStream sslStream)
+        private List<byte> ReadMessage(SslStream sslStream)
         {
             byte[] buffer = new byte[2048];
             int bytes = 0;
@@ -158,7 +158,7 @@ namespace Adv.Server
                     return MasterConnectionApi.CreateServerNoActionPacket();
                 case MasterPacketType.End:
                     return new byte[] {0x81};
-                default: throw new NotImplementedException();
+                default: throw new ArgumentOutOfRangeException();
             }
 
             throw new NotImplementedException();

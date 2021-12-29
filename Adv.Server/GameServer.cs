@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Text;
 using Adv.Server.Master;
+using Adv.Server.Packets.Game;
 
 namespace Adv.Server
 {
@@ -16,10 +17,10 @@ namespace Adv.Server
         {
             var listener = new TcpListener(IPAddress.Any, port);
             listener.Start();
-            TcpClient client = listener.AcceptTcpClient();
             while (true)
             {
                 Console.WriteLine("Waiting for a client to connect...");
+                TcpClient client = listener.AcceptTcpClient();
                 ProcessClient(client);
             }
         }
@@ -39,7 +40,7 @@ namespace Adv.Server
                 while (true)
                 {
                     List<byte> packet = ReadMessage(networkStream);
-                    //var reply = GetNewMessageAndCraftAnswer(packet, client);
+                    var reply = GetNewMessageAndCraftAnswer(packet, client);
                     Console.WriteLine("Msg got!");
 
                     //if (reply.Length == 0) continue;
@@ -64,7 +65,7 @@ namespace Adv.Server
             }
         }
 
-        private static List<byte> ReadMessage(NetworkStream stream)
+        private List<byte> ReadMessage(NetworkStream stream)
         {
             byte[] buffer = new byte[2048];
             int bytes = 0;
@@ -74,6 +75,120 @@ namespace Adv.Server
             } while (bytes == 0);
 
             return buffer.ToList();
+        }
+
+        private byte[] GetNewMessageAndCraftAnswer(List<byte> packet, TcpClient client)
+        {
+            var gamePacketType = Enum.Parse<GamePacketType>(packet[0].ToString());
+
+            switch (gamePacketType)
+            {
+                case GamePacketType.OnNPCConversationStateEvent:
+                    break;
+                case GamePacketType.OnPlayerPositionEvent:
+                    break;
+                case GamePacketType.OnRemoveItemEvent:
+                    break;
+                case GamePacketType.OnActorSpawnEvent:
+                    break;
+                case GamePacketType.OnReloadEvent:
+                    break;
+                case GamePacketType.OnRespawnOtherPlayerEvent:
+                    break;
+                case GamePacketType.OnAddItemEvent:
+                    break;
+                case GamePacketType.OnRemoteReloadEvent:
+                    break;
+                case GamePacketType.OnTeleportEvent:
+                    break;
+                case GamePacketType.OnStartQuestEvent:
+                    break;
+                case GamePacketType.OnTriggerEvent:
+                    break;
+                case GamePacketType.OnPickedUpEvent:
+                    break;
+                case GamePacketType.OnRelativeTeleportEvent:
+                    break;
+                case GamePacketType.OnPositionAndVelocityEvent:
+                    break;
+                case GamePacketType.OnRespawnThisPlayerEvent:
+                    break;
+                case GamePacketType.OnStateEvent:
+                    break;
+                case GamePacketType.OnPvpEnableEvent:
+                    break;
+                case GamePacketType.OnDisplayEvent:
+                    break;
+                case GamePacketType.OnPositionEvent:
+                    break;
+                case GamePacketType.OnActorDestroyEvent:
+                    break;
+                case GamePacketType.OnPlayerItemEvent:
+                    break;
+                case GamePacketType.OnCurrentSlotEvent:
+                    break;
+                case GamePacketType.OnEquipItemEvent:
+                    break;
+                case GamePacketType.OnCircuitOutputEvent:
+                    break;
+                case GamePacketType.OnKillEvent:
+                    break;
+                case GamePacketType.OnSetCurrentQuestEvent:
+                    break;
+                case GamePacketType.OnHealthUpdateEvent:
+                    break;
+                case GamePacketType.OnChatEvent:
+                    break;
+                case GamePacketType.OnFireBulletsEvent:
+                    break;
+                case GamePacketType.OnNPCShopEvent:
+                    break;
+                case GamePacketType.OnPvPCountdownUpdateEvent:
+                    break;
+                case GamePacketType.OnPlayerLeftEvent:
+                    break;
+                case GamePacketType.OnPlayerJoinedEvent:
+                    break;
+                case GamePacketType.OnManaUpdateEvent:
+                    break;
+                case GamePacketType.OnAdvanceQuestToStateEvent:
+                    break;
+                case GamePacketType.OnLoadedAmmoEvent:
+                    break;
+                case GamePacketType.OnLastHitByItemEvent:
+                    break;
+                case GamePacketType.OnCountdownUpdateEvent:
+                    break;
+                case GamePacketType.OnNPCConversationEndEvent:
+                    break;
+                case GamePacketType.OnRegionChangeEvent:
+                    break;
+                case GamePacketType.Use:
+                    break;
+                case GamePacketType.TransitionToNPCState:
+                    break;
+                case GamePacketType.BuyItem:
+                    break;
+                case GamePacketType.Activate:
+                    break;
+                case GamePacketType.FireRequest:
+                    break;
+                case GamePacketType.SellItem:
+                    break;
+                case GamePacketType.Teleport:
+                    break;
+                case GamePacketType.Sprint:
+                    break;
+                case GamePacketType.Jump:
+                    break;
+                case GamePacketType.FastTravel:
+                    break;
+                case GamePacketType.SubmitDLCKey:
+                    break;
+                default: throw new ArgumentOutOfRangeException();
+            }
+
+            throw new NotImplementedException();
         }
     }
 }
