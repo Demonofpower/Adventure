@@ -54,7 +54,7 @@ namespace Adv.Server
 
                     if (sessions[client] is null)
                     {
-                        var clientHelloPacket = GameConnectionApi.ProcessClientHelloPacket(packet.ToArray(), client);
+                        var clientHelloPacket = GameConnectionApi.ProcessClientHelloPacket(packet.ToArray());
 
                         sessions[client] = clientHelloPacket.SessionId;
                         
@@ -105,8 +105,8 @@ namespace Adv.Server
 
         private byte[] GetNewMessageAndCraftAnswer(byte[] packet, TcpClient client)
         {
+            PacketProcessor.SwitchPacketIdEndian(ref packet);
             var gamePacketType = Enum.Parse<GamePacketType>(PacketProcessor.Read16(ref packet).ToString());
-            //var charToken = PacketProcessor.ReadString(ref packet);
 
             switch (gamePacketType)
             {
@@ -147,7 +147,9 @@ namespace Adv.Server
                 case GamePacketType.OnDisplayEvent:
                     break;
                 case GamePacketType.OnPositionEvent:
-                    break;
+                    var clientPosition = GameConnectionApi.ProcessClientPositionPacket(packet);
+
+                    return null;
                 case GamePacketType.OnActorDestroyEvent:
                     break;
                 case GamePacketType.OnPlayerItemEvent:

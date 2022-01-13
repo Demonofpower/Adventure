@@ -8,6 +8,16 @@ namespace Adv.Server.Packets
 {
     public static class PacketProcessor
     {
+        public static void SwitchPacketIdEndian(ref byte[] packet)
+        {
+            if (packet.Length < 2) return;
+
+            var save = packet[0];
+
+            packet[0] = packet[1];
+            packet[1] = save;
+        }
+
         public static byte Read8(ref byte[] packet)
         {
             var result = packet[0];
@@ -18,7 +28,7 @@ namespace Adv.Server.Packets
 
         public static short Read16(ref byte[] packet)
         {
-            var result = BitConverter.ToInt16(packet.ToArray(), 0);
+            var result = BitConverter.ToInt16(packet, 0);
             packet = packet.Skip(2).ToArray();
 
             return result;
@@ -26,7 +36,15 @@ namespace Adv.Server.Packets
 
         public static int Read32(ref byte[] packet)
         {
-            var result = BitConverter.ToInt32(packet.ToArray(), 0);
+            var result = BitConverter.ToInt32(packet, 0);
+            packet = packet.Skip(4).ToArray();
+
+            return result;
+        }
+
+        public static float ReadFloat(ref byte[] packet)
+        {
+            var result = BitConverter.ToSingle(packet, 0);
             packet = packet.Skip(4).ToArray();
 
             return result;
@@ -34,11 +52,29 @@ namespace Adv.Server.Packets
 
         public static string ReadString(ref byte[] packet)
         {
-            var size = BitConverter.ToInt16(packet.ToArray(), 0);
-            var str = System.Text.Encoding.ASCII.GetString(packet.ToArray(), 2, size);
+            var size = BitConverter.ToInt16(packet, 0);
+            var str = System.Text.Encoding.ASCII.GetString(packet, 2, size);
             packet = packet.Skip(size + 2).ToArray();
 
             return str;
+        }
+
+        public static Vector3 ReadVector3(ref byte[] packet)
+        {
+            var x = ReadFloat(ref packet);
+            var y = ReadFloat(ref packet);
+            var z = ReadFloat(ref packet);
+
+            return new Vector3(x, y, z);
+        }
+
+        public static Rotation ReadRotation(ref byte[] packet)
+        {
+            var x = Read16(ref packet);
+            var y = Read16(ref packet);
+            var z = Read16(ref packet);
+
+            return new Rotation(x, y, z);
         }
 
         private static void AddRange(this IList<byte> iList, IList<byte> toAdd)
