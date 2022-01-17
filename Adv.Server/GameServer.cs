@@ -61,7 +61,7 @@ namespace Adv.Server
                         //TODO!!
                         var helloReply = GameConnectionApi.CreateServerHelloPacket(new Vector3(-54150f, -56283f, 1000), new Rotation(0, 0, 0));
                         
-                        networkStream.Write(helloReply);
+                        networkStream.Write(helloReply, 0, helloReply.Length);
                         
                         continue;
                     }
@@ -72,6 +72,7 @@ namespace Adv.Server
                     if (reply == null || reply.Length == 0) continue;
                     //if (reply[0] == 0x81) break;
 
+                    networkStream.Write(new byte[] { 0x52, 0x48 });
                     //networkStream.Write(reply);
                     Console.WriteLine("Msg answer sent!");
                 }

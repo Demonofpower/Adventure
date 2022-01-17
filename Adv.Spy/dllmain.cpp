@@ -61,14 +61,14 @@ void DebugPrint(char* buffer, Type t, int sr)
 		return;
 	}
 
-	if (*((WORD*)buffer) == *(WORD*)"\x6D\x76")
-	{
-		return;
-	}
-	if (*((WORD*)buffer) == *(WORD*)"\x52\x48")
-	{
-		return;
-	}
+	//if (*((WORD*)buffer) == *(WORD*)"\x6D\x76")
+	//{
+	//	return;
+	//}
+	//if (*((WORD*)buffer) == *(WORD*)"\x52\x48")
+	//{
+	//	return;
+	//}
 
 	if (sr == 1)
 	{
@@ -86,12 +86,12 @@ sendFunc hSendFunc;
 int __stdcall SendFunc(SOCKET socket, char* buffer, int len, int flags)
 {
 	Type currType = HandleSocket(socket);
-	
+
 	if (currType != MASTER)
 	{
 		PacketChecker::Check(buffer, len, SEND, currType);
 	}
-	
+
 	/*DebugPrint(buffer, currType, 1);
 
 	reverser.Print(buffer, len, SEND, currType);*/
@@ -106,11 +106,8 @@ int __stdcall RecvFunc(SOCKET socket, char* buffer, int len, int flags)
 {
 	Type currType = HandleSocket(socket);
 
-	if (currType != MASTER)
-	{
-		PacketChecker::Check(buffer, len, RECV, currType);
-	}
-	
+	PacketChecker::Check(buffer, len, RECV, currType);
+
 	/*DebugPrint(buffer, currType, 2);
 
 	reverser.Print(buffer, len, RECV, currType);*/
@@ -127,11 +124,11 @@ int __cdecl SslReadFunc(void* ssl, void* buf, int num)
 
 	PacketChecker::Check((char*)buf, num, RECV, MASTER);
 	//PacketChecker::ProcessMasterPacket((char*)buf, num, RECV);
-	
+
 	return result;
 }
 
-typedef int(__cdecl* sslWriteFunc)(void* ssl, void* buf, int num);
+typedef int (__cdecl* sslWriteFunc)(void* ssl, void* buf, int num);
 sslReadFunc hSslWriteFunc;
 
 int __cdecl SslWriteFunc(void* ssl, void* buf, int num)

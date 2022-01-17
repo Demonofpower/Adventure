@@ -54,5 +54,7 @@
         Jump = 0x6a70,
         FastTravel = 0x6675,
         SubmitDLCKey = 0x6b79,
+        
+        ServerAck = 0x5248
 	}
 }
