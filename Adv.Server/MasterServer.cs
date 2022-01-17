@@ -6,6 +6,7 @@ using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 using Adv.Server.Master;
 using Adv.Server.Master.Enums;
 using Adv.Server.Packets.Master;
@@ -56,6 +57,9 @@ namespace Adv.Server
                 Console.WriteLine("Sending hello message.");
                 sslStream.Write(buffer);
 
+                var t = new Thread(() => SendOk(sslStream));
+                t.Start();
+                
                 while (true)
                 {
                     List<byte> packet = ReadMessage(sslStream);
@@ -86,6 +90,15 @@ namespace Adv.Server
             }
         }
 
+        private void SendOk(SslStream s)
+        {
+            while (true)
+            {
+                Thread.Sleep(10000);
+                s.Write(new byte[] { 0x80 });
+            }
+        }
+        
         private List<byte> ReadMessage(SslStream sslStream)
         {
             byte[] buffer = new byte[2048];

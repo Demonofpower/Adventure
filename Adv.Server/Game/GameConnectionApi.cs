@@ -25,7 +25,7 @@ namespace Adv.Server.Game
         {
             var packet = new List<byte>();
 
-            //TODO!!! id
+            //TODO!!! actorId 0x2bad7
             packet.Write32(1);
             
             packet.WriteVector3(position);

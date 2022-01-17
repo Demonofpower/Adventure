@@ -43,11 +43,7 @@ namespace Adv.Server
             {
                 networkStream.ReadTimeout = int.MaxValue;
                 networkStream.WriteTimeout = int.MaxValue;
-
-                //var buffer = MasterConnectionApi.CreateWelcomePacket(5, "Custom Server", "By Paranoia with <3");
-                //Console.WriteLine("Sending hello message.");
-                //networkStream.Write(buffer);
-
+                
                 while (true)
                 {
                     List<byte> packet = ReadMessage(networkStream);
@@ -61,7 +57,7 @@ namespace Adv.Server
                         //TODO!!
                         var helloReply = GameConnectionApi.CreateServerHelloPacket(new Vector3(-54150f, -56283f, 1000), new Rotation(0, 0, 0));
                         
-                        networkStream.Write(helloReply, 0, helloReply.Length);
+                        networkStream.Write(helloReply);
                         
                         continue;
                     }
