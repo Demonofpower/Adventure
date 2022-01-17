@@ -104,7 +104,7 @@ namespace Adv.Server
             return buffer.ToList();
         }
 
-        private byte[] GetNewMessageAndCraftAnswer(byte[] packet, TcpClient client)
+        private byte[] GetNewMessageAndCraftAnswer(Span<byte> packet, TcpClient client)
         {
             PacketProcessor.SwitchPacketIdEndian(ref packet);
             var gamePacketType = Enum.Parse<GamePacketType>(PacketProcessor.Read16(ref packet).ToString());

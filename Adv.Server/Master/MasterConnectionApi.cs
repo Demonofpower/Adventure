@@ -39,9 +39,9 @@ namespace Adv.Server.Master
             return buffer.ToArray();
         }
 
-        public static ClientLoginPacket ProcessClientLoginPacket(byte[] packet)
+        public static ClientLoginPacket ProcessClientLoginPacket(Span<byte> packet)
         {
-            var clientLoginPacket = new ClientLoginPacket(packet.ToList())
+            var clientLoginPacket = new ClientLoginPacket(packet.ToArray().ToList())
             {
                 Id = PacketProcessor.Read8(ref packet),
                 Username = PacketProcessor.ReadString(ref packet),
@@ -51,9 +51,9 @@ namespace Adv.Server.Master
             return clientLoginPacket;
         }
 
-        public static ClientJoinGameServerPacket ProcessClientJoinGameServerPacket(byte[] packet)
+        public static ClientJoinGameServerPacket ProcessClientJoinGameServerPacket(Span<byte> packet)
         {
-            var clientJoinGameServerPacket = new ClientJoinGameServerPacket(packet.ToList())
+            var clientJoinGameServerPacket = new ClientJoinGameServerPacket(packet.ToArray().ToList())
             {
                 CharacterId = PacketProcessor.Read32(ref packet)
             };

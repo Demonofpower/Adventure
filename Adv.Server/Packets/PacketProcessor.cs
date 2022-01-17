@@ -8,7 +8,7 @@ namespace Adv.Server.Packets
 {
     public static class PacketProcessor
     {
-        public static void SwitchPacketIdEndian(ref byte[] packet)
+        public static void SwitchPacketIdEndian(ref Span<byte> packet)
         {
             if (packet.Length < 2) return;
 
@@ -18,48 +18,48 @@ namespace Adv.Server.Packets
             packet[1] = save;
         }
 
-        public static byte Read8(ref byte[] packet)
+        public static byte Read8(ref Span<byte> packet)
         {
             var result = packet[0];
-            packet = packet.Skip(1).ToArray();
+            packet = packet.Slice(1);
 
             return result;
         }
 
-        public static short Read16(ref byte[] packet)
+        public static short Read16(ref Span<byte> packet)
         {
-            var result = BitConverter.ToInt16(packet, 0);
-            packet = packet.Skip(2).ToArray();
+            var result = BitConverter.ToInt16(packet);
+            packet = packet.Slice(2);
 
             return result;
         }
 
-        public static int Read32(ref byte[] packet)
+        public static int Read32(ref Span<byte> packet)
         {
-            var result = BitConverter.ToInt32(packet, 0);
-            packet = packet.Skip(4).ToArray();
+            var result = BitConverter.ToInt32(packet);
+            packet = packet.Slice(4);
 
             return result;
         }
 
-        public static float ReadFloat(ref byte[] packet)
+        public static float ReadFloat(ref Span<byte> packet)
         {
-            var result = BitConverter.ToSingle(packet, 0);
-            packet = packet.Skip(4).ToArray();
+            var result = BitConverter.ToSingle(packet);
+            packet = packet.Slice(4);
 
             return result;
         }
 
-        public static string ReadString(ref byte[] packet)
+        public static string ReadString(ref Span<byte> packet)
         {
-            var size = BitConverter.ToInt16(packet, 0);
-            var str = System.Text.Encoding.ASCII.GetString(packet, 2, size);
-            packet = packet.Skip(size + 2).ToArray();
+            var size = BitConverter.ToInt16(packet);
+            var str = System.Text.Encoding.ASCII.GetString(packet.Slice(2, size));
+            packet = packet.Slice(size + 2);
 
             return str;
         }
 
-        public static Vector3 ReadVector3(ref byte[] packet)
+        public static Vector3 ReadVector3(ref Span<byte> packet)
         {
             var x = ReadFloat(ref packet);
             var y = ReadFloat(ref packet);
@@ -68,7 +68,7 @@ namespace Adv.Server.Packets
             return new Vector3(x, y, z);
         }
 
-        public static Rotation ReadRotation(ref byte[] packet)
+        public static Rotation ReadRotation(ref Span<byte> packet)
         {
             var x = Read16(ref packet);
             var y = Read16(ref packet);

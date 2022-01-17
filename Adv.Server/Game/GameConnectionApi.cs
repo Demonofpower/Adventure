@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Numerics;
@@ -10,9 +11,9 @@ namespace Adv.Server.Game
 {
     static class GameConnectionApi
     {
-        public static ClientHelloPacket ProcessClientHelloPacket(byte[] packet)
+        public static ClientHelloPacket ProcessClientHelloPacket(Span<byte> packet)
         {
-            var clientHelloPacket = new ClientHelloPacket(packet.ToList());
+            var clientHelloPacket = new ClientHelloPacket(packet.ToArray().ToList());
             
             clientHelloPacket.CharacterId = PacketProcessor.Read32(ref packet);
             clientHelloPacket.SessionId = PacketProcessor.ReadString(ref packet);
@@ -33,9 +34,9 @@ namespace Adv.Server.Game
             return packet.ToArray();
         }
 
-        public static ClientPositionPacket ProcessClientPositionPacket(byte[] packet)
+        public static ClientPositionPacket ProcessClientPositionPacket(Span<byte> packet)
         {
-            var clientPlayerPositionPacket = new ClientPositionPacket(packet.ToList());
+            var clientPlayerPositionPacket = new ClientPositionPacket(packet.ToArray().ToList());
 
             clientPlayerPositionPacket.Position = PacketProcessor.ReadVector3(ref packet);
             clientPlayerPositionPacket.Rotation = PacketProcessor.ReadRotation(ref packet);
