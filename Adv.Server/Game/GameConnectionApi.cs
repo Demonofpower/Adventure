@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
 using System.Numerics;
-using System.Text;
 using Adv.Server.Packets;
 using Adv.Server.Packets.Game;
 using Adv.Server.Util;
