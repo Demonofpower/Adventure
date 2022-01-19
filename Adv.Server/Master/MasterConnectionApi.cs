@@ -65,12 +65,17 @@ namespace Adv.Server.Master
         {
             var buffer = new List<byte>();
 
-            buffer.Add(0x1);
+            var success = user != null;
+            
+            buffer.Write8(success);
 
-            buffer.Write32(user.Id);
-            buffer.WriteString(user.Team.SecretTeamName);
-            buffer.WriteString(user.Team.TeamName);
-            buffer.Write8(user.IsAdmin);
+            if (success)
+            {
+                buffer.Write32(user.Id);
+                buffer.WriteString(user.Team.SecretTeamName);
+                buffer.WriteString(user.Team.TeamName);
+                buffer.Write8(user.IsAdmin);
+            }
 
             return buffer.ToArray();
         }

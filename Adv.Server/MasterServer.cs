@@ -54,7 +54,6 @@ namespace Adv.Server
                 loggedInUser.Add(client, null);
 
                 var buffer = MasterConnectionApi.CreateWelcomePacket(5, "Custom Server", "By Paranoia with <3");
-                Console.WriteLine("Sending hello message.");
                 sslStream.Write(buffer);
 
                 var t = new Thread(() => SendOk(sslStream));
@@ -64,13 +63,11 @@ namespace Adv.Server
                 {
                     List<byte> packet = ReadMessage(sslStream);
                     var reply = GetNewMessageAndCraftAnswer(packet, client);
-                    Console.WriteLine("Msg got!");
 
                     if (reply.Length == 0) continue;
                     if (reply[0] == 0x81) break;
 
                     sslStream.Write(reply);
-                    Console.WriteLine("Msg answer sent!");
                 }
             }
             catch (AuthenticationException e)
@@ -121,11 +118,22 @@ namespace Adv.Server
             {
                 case MasterPacketType.Login:
                     var clientLoginPacket = MasterConnectionApi.ProcessClientLoginPacket(packet.ToArray());
+                    Console.WriteLine($"UserLogin - User: {clientLoginPacket.Username} PW: {clientLoginPacket.Password}");
+                    
+                    var user = Users.FirstOrDefault(u =>
+                        u.Username == clientLoginPacket.Username && u.Password == clientLoginPacket.Password);
 
-                    loggedInUser[client] = Users.FirstOrDefault(u => u.Username == clientLoginPacket.Username);
+                    if (user != null)
+                    {
+                        loggedInUser[client] = user;
+                        Console.WriteLine("Logged in.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Username or Password incorrect!");
+                    }
 
-                    return MasterConnectionApi.CreateServerLoginPacket(Users.FirstOrDefault(u =>
-                        u.Username == clientLoginPacket.Username && u.Password == clientLoginPacket.Password));
+                    return MasterConnectionApi.CreateServerLoginPacket(user);
                 case MasterPacketType.Register:
                     break;
                 case MasterPacketType.GetPlayerCounts:
