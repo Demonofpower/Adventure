@@ -8,6 +8,14 @@ namespace Adv.Server.Packets
 {
     public static class PacketProcessor
     {
+        public static byte[] StringToByteArray(string hex)
+        {
+            return Enumerable.Range(0, hex.Length)
+                .Where(x => x % 2 == 0)
+                .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
+                .ToArray();
+        }
+
         public static void SwitchPacketIdEndian(ref Span<byte> packet)
         {
             if (packet.Length < 2) return;

@@ -94,8 +94,8 @@ namespace Adv.Server
         {
             while (true)
             {
-                Thread.Sleep(10000);
-                s.Write(new byte[] { 0x80 });
+                //Thread.Sleep(10000);
+                //s.Write(new byte[] { 0x80 });
             }
         }
         
