@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Numerics;
-using System.Text;
 using Adv.Server.Game;
 using Adv.Server.Packets;
 using Adv.Server.Packets.Game;

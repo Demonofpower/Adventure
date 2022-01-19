@@ -21,16 +21,16 @@ namespace Adv.Server
         public static List<Quest> Quests;
         public static List<Item> Items;
         public static List<Achievement> Achievements;
-
-        private static X509Certificate serverCertificate = null;
-
+        
         private Dictionary<TcpClient, User> loggedInUser;
 
+        private static X509Certificate serverCertificate;
+        
         public void Start(int port, string certificate)
         {
             Populate();
 
-            serverCertificate = X509Certificate2.CreateFromSignedFile(certificate);
+            serverCertificate = X509Certificate.CreateFromSignedFile(certificate);
 
             TcpListener listener = new TcpListener(IPAddress.Any, port);
             listener.Start();
@@ -56,9 +56,6 @@ namespace Adv.Server
 
                 var buffer = MasterConnectionApi.CreateWelcomePacket(5, "Custom Server", "By Paranoia with <3");
                 sslStream.Write(buffer);
-
-                var t = new Thread(() => SendOk(sslStream));
-                t.Start();
                 
                 while (true)
                 {
@@ -89,20 +86,11 @@ namespace Adv.Server
                 client.Close();
             }
         }
-
-        private void SendOk(SslStream s)
-        {
-            while (true)
-            {
-                //Thread.Sleep(10000);
-                //s.Write(new byte[] { 0x80 });
-            }
-        }
         
         private List<byte> ReadMessage(SslStream sslStream)
         {
             byte[] buffer = new byte[2048];
-            int bytes = 0;
+            int bytes;
             do
             {
                 bytes = sslStream.Read(buffer, 0, buffer.Length);
