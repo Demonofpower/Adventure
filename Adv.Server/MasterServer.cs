@@ -9,6 +9,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using Adv.Server.Master;
 using Adv.Server.Master.Enums;
+using Adv.Server.Packets;
 using Adv.Server.Packets.Master;
 
 namespace Adv.Server
@@ -62,7 +63,9 @@ namespace Adv.Server
                 while (true)
                 {
                     List<byte> packet = ReadMessage(sslStream);
-                    var reply = GetNewMessageAndCraftAnswer(packet, client);
+                    var arrayPacket = new Span<byte>(packet.ToArray());
+
+                    var reply = GetNewMessageAndCraftAnswer(arrayPacket, client);
 
                     if (reply.Length == 0) continue;
                     if (reply[0] == 0x81) break;
@@ -108,16 +111,16 @@ namespace Adv.Server
             return buffer.ToList();
         }
 
-        private byte[] GetNewMessageAndCraftAnswer(List<byte> packet, TcpClient client)
+        private byte[] GetNewMessageAndCraftAnswer(Span<byte> packet, TcpClient client)
         {
             var currentUser = GetUserByTcpClient(client);
             Character currentCharacter = null;
-            var masterPacketType = Enum.Parse<MasterPacketType>(packet[0].ToString());
+            var masterPacketType = Enum.Parse<MasterPacketType>(PacketProcessor.Read8(ref packet).ToString());
 
             switch (masterPacketType)
             {
                 case MasterPacketType.Login:
-                    var clientLoginPacket = MasterConnectionApi.ProcessClientLoginPacket(packet.ToArray());
+                    var clientLoginPacket = MasterConnectionApi.ProcessClientLoginPacket(packet);
                     Console.WriteLine($"UserLogin - User: {clientLoginPacket.Username} PW: {clientLoginPacket.Password}");
                     
                     var user = Users.FirstOrDefault(u =>
@@ -135,7 +138,12 @@ namespace Adv.Server
 
                     return MasterConnectionApi.CreateServerLoginPacket(user);
                 case MasterPacketType.Register:
-                    break;
+                    var clientRegisterPacket = MasterConnectionApi.ProcessClientRegisterPacket(packet);
+                    Console.WriteLine($"UserRegister - Name: {clientRegisterPacket.Username} Team: {clientRegisterPacket.TeamNameOrHash} Team: {clientRegisterPacket.Password}");
+
+                    //TODO SAVE USER
+
+                    return MasterConnectionApi.CreateServerRegisterPacket(null, "I love you");
                 case MasterPacketType.GetPlayerCounts:
                     return MasterConnectionApi.CreateServerPlayerCountPacket();
                 case MasterPacketType.GetTeammates:

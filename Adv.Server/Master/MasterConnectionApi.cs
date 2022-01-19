@@ -43,7 +43,6 @@ namespace Adv.Server.Master
         {
             var clientLoginPacket = new ClientLoginPacket(packet.ToArray().ToList())
             {
-                Id = PacketProcessor.Read8(ref packet),
                 Username = PacketProcessor.ReadString(ref packet),
                 Password = PacketProcessor.ReadString(ref packet)
             };
@@ -183,6 +182,39 @@ namespace Adv.Server.Master
             foreach (var achievement in achievements)
             {
                 buffer.WriteString(achievement.Name);
+            }
+
+            return buffer.ToArray();
+        }
+
+        public static ClientRegisterPacket ProcessClientRegisterPacket(Span<byte> packet)
+        {
+            var clientRegisterPacket = new ClientRegisterPacket(packet.ToArray().ToList());
+
+            clientRegisterPacket.Username = PacketProcessor.ReadString(ref packet);
+            clientRegisterPacket.TeamNameOrHash = PacketProcessor.ReadString(ref packet);
+            clientRegisterPacket.Password = PacketProcessor.ReadString(ref packet);
+
+            return clientRegisterPacket;
+        }
+
+        public static byte[] CreateServerRegisterPacket(User user, string errorMessage = null)
+        {
+            var buffer = new List<byte>();
+            
+            var success = user != null;
+            buffer.Write8(success);
+
+            if (success)
+            {
+                buffer.Write32(user.Id);
+                buffer.WriteString(user.Team.SecretTeamName);
+                buffer.WriteString(user.Team.TeamName);
+                buffer.Write8(user.IsAdmin);
+            }
+            else
+            {
+                buffer.WriteString(errorMessage);
             }
 
             return buffer.ToArray();
