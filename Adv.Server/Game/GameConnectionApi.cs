@@ -35,7 +35,7 @@ namespace Adv.Server.Game
             return packet.ToArray();
         }
 
-        public static ClientPositionPacket ProcessClientPositionPacket(Span<byte> packet)
+        public static ClientPositionPacket ProcessClientPositionPacket(ref Span<byte> packet)
         {
             var clientPlayerPositionPacket = new ClientPositionPacket(packet.ToArray().ToList());
 
@@ -83,6 +83,15 @@ namespace Adv.Server.Game
             packet.Write32(0x0);
 
             return packet.ToArray();
+        }
+
+        public static ClientJumpPacket ProcessClientJumpPacket(ref Span<byte> packet)
+        {
+            var clientJumpPacket = new ClientJumpPacket(packet.ToArray().ToList());
+
+            clientJumpPacket.JumpState = PacketProcessor.Read8(ref packet);
+
+            return clientJumpPacket;
         }
     }
 }
