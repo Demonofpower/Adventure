@@ -15,18 +15,15 @@ namespace Adv.Server.Util.Database
             this.connectionString = connectionString;
             connection = new MySqlConnection(connectionString);
             connection.Open();
-            
+
             Init();
         }
 
         public void Init()
         {
-            using var createDBCommand = connection.CreateCommand();
-            createDBCommand.CommandText = "CREATE DATABASE IF NOT EXISTS `Adventure`;";
-            createDBCommand.ExecuteNonQuery();
+            ExecuteNonQuery(@"CREATE DATABASE IF NOT EXISTS `Adventure`;");
 
-            using var createCharactersTableCommand = connection.CreateCommand();
-            createCharactersTableCommand.CommandText = @"CREATE TABLE IF NOT EXISTS Adventure.Characters (
+            ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS Adventure.Characters (
                                 id INT AUTO_INCREMENT PRIMARY KEY,
                                 name VARCHAR(255) NOT NULL,
                                 location INT NOT NULL,
@@ -38,37 +35,44 @@ namespace Adv.Server.Util.Database
                                 flags INT NOT NULL,
                                 isAdmin BOOLEAN NOT NULL,
                                 user INT NOT NULL
-                                );";
-            createCharactersTableCommand.ExecuteNonQuery();
-            
-            using var createTeamTableCommand = connection.CreateCommand();
-            createTeamTableCommand.CommandText = @"CREATE TABLE IF NOT EXISTS Adventure.Teams (
+                                );");
+
+            ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS Adventure.Teams (
                                 id INT AUTO_INCREMENT PRIMARY KEY,
                                 name VARCHAR(255) NOT NULL,
                                 secretName VARCHAR(255) NOT NULL
-                                );";
-            createTeamTableCommand.ExecuteNonQuery();
-            
-            using var createUserTableCommand = connection.CreateCommand();
-            createUserTableCommand.CommandText = @"CREATE TABLE IF NOT EXISTS Adventure.Users (
+                                );");
+
+            ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS Adventure.Users (
                                 id INT AUTO_INCREMENT PRIMARY KEY,
                                 username VARCHAR(255) NOT NULL,
                                 password VARCHAR(255) NOT NULL,
                                 isAdmin BOOLEAN NOT NULL,
                                 team INT,
                                 FOREIGN KEY (team) REFERENCES Adventure.Teams(id)
-                                );";
-            createUserTableCommand.ExecuteNonQuery();
+                                );");
 
-            using var addUserForeignKeyToCharacterCommand = connection.CreateCommand();
-            addUserForeignKeyToCharacterCommand.CommandText = @"ALTER TABLE Adventure.Characters ADD FOREIGN KEY (user) REFERENCES Adventure.Users(id);";
-            addUserForeignKeyToCharacterCommand.ExecuteNonQuery();
+            ExecuteNonQuery(@"ALTER TABLE Adventure.Characters ADD FOREIGN KEY (user) REFERENCES Adventure.Users(id);");
         }
 
-        public void ExecuteQuery(string commandText)
+        public void ExecuteNonQuery(string commandText, params Tuple<string, object>[] parameters)
         {
             var command = new MySqlCommand(commandText, connection);
+            foreach (var parameter in parameters)
+            {
+                command.Parameters.AddWithValue(parameter.Item1, parameter.Item2);
+            }
             command.ExecuteNonQuery();
+        }
+
+        public MySqlDataReader ExecuteQuery(string commandText, params Tuple<string, object>[] parameters)
+        {
+            var command = new MySqlCommand(commandText, connection);
+            foreach (var parameter in parameters)
+            {
+                command.Parameters.AddWithValue(parameter.Item1, parameter.Item2);
+            }
+            return command.ExecuteReader();
         }
 
         public void Dispose()

@@ -198,7 +198,7 @@ namespace Adv.Server
             userCharList.Add(new Character(1, "Juli", Location.TODO, 1, 1, 1, 1, 1, 1, true));
 
             Users = new List<User>();
-            Users.Add(new User("j", "j", 1, Teams[0], true, userCharList));
+            Users.Add(new User("j", "j", Teams[0], true, userCharList, 1));
         }
 
         private User GetUserByTcpClient(TcpClient client)
