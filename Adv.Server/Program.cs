@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Adv.Server.Util.Database;
 
 namespace Adv.Server
 {
@@ -10,6 +11,8 @@ namespace Adv.Server
         
         public static int Main(string[] args)
         {
+            var db = new DatabaseConnection("Server=localhost;Port=3306;Uid=Juli;Pwd=pwnadventure3;");
+            
             masterServer = new MasterServer();
             var masterServerThread = new Thread(StartMasterServer);
             masterServerThread.Start();
