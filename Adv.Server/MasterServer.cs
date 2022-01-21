@@ -11,6 +11,8 @@ using Adv.Server.Master;
 using Adv.Server.Master.Enums;
 using Adv.Server.Packets;
 using Adv.Server.Packets.Master;
+using Adv.Server.Util.Database;
+using Adv.Server.Util.Database.API;
 
 namespace Adv.Server
 {
@@ -24,12 +26,16 @@ namespace Adv.Server
         
         private Dictionary<TcpClient, User> loggedInUser;
 
+        private DatabaseConnection dbConnection = null;
+
         private static X509Certificate serverCertificate;
         
-        public void Start(int port, string certificate)
+        public void Start(int port, string certificate, DatabaseConnection dbConnection)
         {
+            this.dbConnection = dbConnection;
+            
             Populate();
-
+            
             serverCertificate = X509Certificate.CreateFromSignedFile(certificate);
 
             TcpListener listener = new TcpListener(IPAddress.Any, port);
@@ -127,11 +133,20 @@ namespace Adv.Server
                     return MasterConnectionApi.CreateServerLoginPacket(user);
                 case MasterPacketType.Register:
                     var clientRegisterPacket = MasterConnectionApi.ProcessClientRegisterPacket(packet);
-                    Console.WriteLine($"UserRegister - Name: {clientRegisterPacket.Username} Team: {clientRegisterPacket.TeamNameOrHash} Team: {clientRegisterPacket.Password}");
+                    Console.WriteLine($"UserRegister - Name: {clientRegisterPacket.Username} Team: {clientRegisterPacket.TeamNameOrHash} Pw: {clientRegisterPacket.Password}");
 
-                    //TODO SAVE USER
+                    var team = new Team(clientRegisterPacket.TeamNameOrHash, clientRegisterPacket.TeamNameOrHash);
+                    var newUser = new User(clientRegisterPacket.Username, clientRegisterPacket.Password, team, false, new List<Character>());
+                    var result = DatabaseUserApi.AddUser(newUser, dbConnection);
 
-                    return MasterConnectionApi.CreateServerRegisterPacket(null, "I love you");
+                    if (result)
+                    {
+                        return MasterConnectionApi.CreateServerRegisterPacket(newUser, null);
+                    }
+                    else
+                    {
+                        return MasterConnectionApi.CreateServerRegisterPacket(null, "An error occurred while creating your character!");
+                    }
                 case MasterPacketType.GetPlayerCounts:
                     return MasterConnectionApi.CreateServerPlayerCountPacket();
                 case MasterPacketType.GetTeammates:
@@ -192,13 +207,21 @@ namespace Adv.Server
             Achievements = new List<Achievement>();
 
             Teams = new List<Team>();
-            Teams.Add(new Team("Dev", "133769420"));
+            var dbTeams = DatabaseTeamApi.GetAllTeams(dbConnection);
+            if (dbTeams != null)
+            {
+                Teams.AddRange(dbTeams);
+            }
 
             var userCharList = new List<Character>();
             userCharList.Add(new Character(1, "Juli", Location.TODO, 1, 1, 1, 1, 1, 1, true));
 
             Users = new List<User>();
-            Users.Add(new User("j", "j", Teams[0], true, userCharList, 1));
+            var dbUsers = DatabaseUserApi.GetAllUsers(dbConnection, Teams);
+            if (dbUsers != null)
+            {
+                Users.AddRange(dbUsers);
+            }
         }
 
         private User GetUserByTcpClient(TcpClient client)
@@ -208,9 +231,6 @@ namespace Adv.Server
 
         private Character GetCharacterById(int id, User user)
         {
-            return user.Characters.FirstOrDefault();
-
-            //TODO!!!
             return user.Characters.FirstOrDefault(c => id == c.Id);
         }
     }

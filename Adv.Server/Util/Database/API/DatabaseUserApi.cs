@@ -7,7 +7,7 @@ namespace Adv.Server.Util.Database.API
 {
     class DatabaseUserApi
     {
-        public static List<User> GetAllUsers(DatabaseConnection connection)
+        public static List<User> GetAllUsers(DatabaseConnection connection, List<Team> allTeams)
         {
             var result = connection.ExecuteQuery(@"SELECT * from adventure.users");
 
@@ -21,15 +21,17 @@ namespace Adv.Server.Util.Database.API
                     var username = result.GetString("username");
                     var password = result.GetString("password");
                     var isAdmin = result.GetBoolean("isAdmin");
+                    var userTeam = result.GetInt32("team");
 
-                    //TODO TEAM + CHARACTERS
-                    
-                    list.Add(new User(username, password, null, isAdmin, new List<Character>(), id));
+                    var team = allTeams.First(t => t.Id == userTeam);
+
+                    list.Add(new User(username, password, team, isAdmin, new List<Character>(), id));
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
+                result.Close();
             }
 
             result.Close();
@@ -49,11 +51,11 @@ namespace Adv.Server.Util.Database.API
                     var id = result.GetInt32("id");
                     var password = result.GetString("password");
                     var isAdmin = result.GetBoolean("isAdmin");
-
-                    //TODO TEAM + CHARACTERS
-
                     result.Close();
-                    return new User(name, password, null, isAdmin, new List<Character>(), id);
+
+                    var team = DatabaseTeamApi.GetTeamById(result.GetInt32("team"), connection);
+
+                    return new User(name, password, team, isAdmin, new List<Character>(), id);
                 }
             }
             catch (Exception e)
@@ -77,11 +79,11 @@ namespace Adv.Server.Util.Database.API
                     var username = result.GetString("username");
                     var password = result.GetString("password");
                     var isAdmin = result.GetBoolean("isAdmin");
-
-                    //TODO TEAM + CHARACTERS
-
                     result.Close();
-                    return new User(username, password, null, isAdmin, new List<Character>(), id);
+
+                    var team = DatabaseTeamApi.GetTeamById(result.GetInt32("team"), connection);
+
+                    return new User(username, password, team, isAdmin, new List<Character>(), id);
                 }
             }
             catch (Exception e)
@@ -93,22 +95,47 @@ namespace Adv.Server.Util.Database.API
             return null;
         }
 
-        public static void AddUser(User user, DatabaseConnection connection)
+        public static bool AddUser(User user, DatabaseConnection connection)
         {
+            if (user.Characters.Any())
+            {
+                throw new NotSupportedException("Add the user first before characters!");
+            }
+            
+            var team = DatabaseTeamApi.GetTeamBySecretName(user.Team.SecretTeamName, connection);
+
             var cmdText =
                 @"INSERT INTO adventure.users(username,password,isAdmin,team) VALUES(@username, @password, @isAdmin, @team)";
 
             var username = new Tuple<string, object>("@username", user.Username);
             var password = new Tuple<string, object>("@password", user.Password);
             var isAdmin = new Tuple<string, object>("@isAdmin", user.IsAdmin);
-            var team = new Tuple<string, object>("@team", user.Team);
 
-            if (user.Characters.Any())
+            if (team == null)
             {
-                throw new NotSupportedException("Add the user first before characters!");
+                team = DatabaseTeamApi.GetTeamByName(user.Team.TeamName, connection);
+                if (team == null)
+                {
+                    DatabaseTeamApi.AddTeam(new Team(user.Team.TeamName, user.Team.SecretTeamName), connection);
+                    team = DatabaseTeamApi.GetTeamByName(user.Team.TeamName, connection);
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            
+            try
+            {
+                connection.ExecuteNonQuery(cmdText, username, password, isAdmin, new Tuple<string, object>("@team", team.Id));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return false;
             }
 
-            connection.ExecuteNonQuery(cmdText, username, password, isAdmin, team);
+            return true;
         }
     }
 }

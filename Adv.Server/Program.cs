@@ -17,7 +17,7 @@ namespace Adv.Server
             var db = new DatabaseConnection("Server=localhost;Port=3306;Uid=Juli;Pwd=pwnadventure3;");
             
             masterServer = new MasterServer();
-            var masterServerThread = new Thread(StartMasterServer);
+            var masterServerThread = new Thread(() => StartMasterServer(db));
             masterServerThread.Start();
             
             gameServer = new GameServer();
@@ -30,9 +30,9 @@ namespace Adv.Server
             return 0;
         }
 
-        private static void StartMasterServer()
+        private static void StartMasterServer(DatabaseConnection dbConnection)
         {
-            masterServer.Start(3333, @"C:\Users\Juli\Desktop\ssl\192.168.178.32.pfx");
+            masterServer.Start(3333, @"C:\Users\Juli\Desktop\ssl\192.168.178.32.pfx", dbConnection);
         }
 
         private static void StartGameServer()
