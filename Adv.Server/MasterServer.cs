@@ -137,15 +137,15 @@ namespace Adv.Server
 
                     var team = new Team(clientRegisterPacket.TeamNameOrHash, clientRegisterPacket.TeamNameOrHash);
                     var newUser = new User(clientRegisterPacket.Username, clientRegisterPacket.Password, team, false, new List<Character>());
-                    var result = DatabaseUserApi.AddUser(newUser, dbConnection);
+                    var addUserResult = DatabaseUserApi.AddUser(newUser, dbConnection);
 
-                    if (result)
+                    if (addUserResult)
                     {
                         return MasterConnectionApi.CreateServerRegisterPacket(newUser, null);
                     }
                     else
                     {
-                        return MasterConnectionApi.CreateServerRegisterPacket(null, "An error occurred while creating your character!");
+                        return MasterConnectionApi.CreateServerRegisterPacket(null, "An error occurred while creating your account!");
                     }
                 case MasterPacketType.GetPlayerCounts:
                     return MasterConnectionApi.CreateServerPlayerCountPacket();
@@ -154,7 +154,18 @@ namespace Adv.Server
                 case MasterPacketType.CharacterList:
                     return MasterConnectionApi.CreateServerCharacterListPacket(currentUser);
                 case MasterPacketType.CreateCharacter:
-                    break;
+                    var clientCreateCharacterPacket = MasterConnectionApi.ProcessClientCreateCharacterPacket(packet);
+                    Console.WriteLine($"CreateCharacter - Name: {clientCreateCharacterPacket.Name} User: {currentUser.Username}");
+
+                    var createCharacterResult = false;
+                    if (createCharacterResult)
+                    {
+                        return MasterConnectionApi.CreateServerCreateCharacterPacket(null, null);
+                    }
+                    else
+                    {
+                        return MasterConnectionApi.CreateServerCreateCharacterPacket(null, "An error occurred while creating your character!");
+                    }
                 case MasterPacketType.DeleteCharacter:
                     break;
                 case MasterPacketType.JoinGameServer:

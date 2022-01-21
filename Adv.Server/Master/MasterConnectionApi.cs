@@ -64,7 +64,7 @@ namespace Adv.Server.Master
             var buffer = new List<byte>();
 
             var success = user != null;
-            
+
             buffer.Write8(success);
 
             if (success)
@@ -200,7 +200,7 @@ namespace Adv.Server.Master
         public static byte[] CreateServerRegisterPacket(User user, string errorMessage = null)
         {
             var buffer = new List<byte>();
-            
+
             var success = user != null;
             buffer.Write8(success);
 
@@ -210,6 +210,39 @@ namespace Adv.Server.Master
                 buffer.WriteString(user.Team.SecretTeamName);
                 buffer.WriteString(user.Team.TeamName);
                 buffer.Write8(user.IsAdmin);
+            }
+            else
+            {
+                buffer.WriteString(errorMessage);
+            }
+
+            return buffer.ToArray();
+        }
+
+        public static ClientCreateCharacterPacket ProcessClientCreateCharacterPacket(Span<byte> packet)
+        {
+            var clientCreateCharacterPacket = new ClientCreateCharacterPacket(packet.ToArray().ToList());
+
+            clientCreateCharacterPacket.Name = PacketProcessor.ReadString(ref packet);
+            clientCreateCharacterPacket.Avatar = PacketProcessor.Read8(ref packet);
+            clientCreateCharacterPacket.ColorA = PacketProcessor.Read32(ref packet);
+            clientCreateCharacterPacket.ColorB = PacketProcessor.Read32(ref packet);
+            clientCreateCharacterPacket.ColorC = PacketProcessor.Read32(ref packet);
+            clientCreateCharacterPacket.ColorD = PacketProcessor.Read32(ref packet);
+
+            return clientCreateCharacterPacket;
+        }
+
+        public static byte[] CreateServerCreateCharacterPacket(Character character, string errorMessage = null)
+        {
+            var buffer = new List<byte>();
+
+            var success = character != null;
+            buffer.Write8(success);
+
+            if (success)
+            {
+                buffer.Write32(character.Id);
             }
             else
             {
