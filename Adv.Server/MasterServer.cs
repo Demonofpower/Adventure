@@ -6,7 +6,6 @@ using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
-using System.Threading;
 using Adv.Server.Master;
 using Adv.Server.Master.Enums;
 using Adv.Server.Packets;
@@ -20,6 +19,7 @@ namespace Adv.Server
     {
         public static List<User> Users;
         public static List<Team> Teams;
+        public static List<Character> Characters;
         public static List<Quest> Quests;
         public static List<Item> Items;
         public static List<Achievement> Achievements;
@@ -137,10 +137,13 @@ namespace Adv.Server
 
                     var team = new Team(clientRegisterPacket.TeamNameOrHash, clientRegisterPacket.TeamNameOrHash);
                     var newUser = new User(clientRegisterPacket.Username, clientRegisterPacket.Password, team, false, new List<Character>());
-                    var addUserResult = DatabaseUserApi.AddUser(newUser, dbConnection);
+                    var addUserResult = DatabaseUserApi.AddUser(newUser, Teams, dbConnection);
+
+                    Reload();
 
                     if (addUserResult)
                     {
+                        loggedInUser[client] = Users.First(u => u.Username == newUser.Username);
                         return MasterConnectionApi.CreateServerRegisterPacket(newUser, null);
                     }
                     else
@@ -157,10 +160,19 @@ namespace Adv.Server
                     var clientCreateCharacterPacket = MasterConnectionApi.ProcessClientCreateCharacterPacket(packet);
                     Console.WriteLine($"CreateCharacter - Name: {clientCreateCharacterPacket.Name} User: {currentUser.Username}");
 
-                    var createCharacterResult = false;
+
+                    var character = new Character(clientCreateCharacterPacket.Name, Location.TODO,
+                        clientCreateCharacterPacket.Avatar, clientCreateCharacterPacket.ColorA,
+                        clientCreateCharacterPacket.ColorB, clientCreateCharacterPacket.ColorC,
+                        clientCreateCharacterPacket.ColorD, 0, false, currentUser);
+                    
+                    var createCharacterResult = DatabaseCharacterApi.AddCharacter(character, dbConnection);
+                    
+                    Reload();
+                    
                     if (createCharacterResult)
                     {
-                        return MasterConnectionApi.CreateServerCreateCharacterPacket(null, null);
+                        return MasterConnectionApi.CreateServerCreateCharacterPacket(Characters.First(c => c.Name == character.Name));
                     }
                     else
                     {
@@ -170,7 +182,7 @@ namespace Adv.Server
                     break;
                 case MasterPacketType.JoinGameServer:
                     var clientJoinGameServerPacket = MasterConnectionApi.ProcessClientJoinGameServerPacket(packet.ToArray());
-                    currentCharacter = GetCharacterById(clientJoinGameServerPacket.CharacterId, currentUser);
+                    currentCharacter = GetCharacterById(clientJoinGameServerPacket.CharacterId);
                     
                     return MasterConnectionApi.CreateServerJoinGameServerPacket(currentUser, currentCharacter);
                 case MasterPacketType.ValidateCharacterToken:
@@ -224,25 +236,63 @@ namespace Adv.Server
                 Teams.AddRange(dbTeams);
             }
 
-            var userCharList = new List<Character>();
-            userCharList.Add(new Character(1, "Juli", Location.TODO, 1, 1, 1, 1, 1, 1, true));
-
             Users = new List<User>();
             var dbUsers = DatabaseUserApi.GetAllUsers(dbConnection, Teams);
             if (dbUsers != null)
             {
                 Users.AddRange(dbUsers);
             }
+
+            Characters = new List<Character>();
+            var dbCharacters = DatabaseCharacterApi.GetAllCharacters(dbConnection, Users);
+            if (dbCharacters != null)
+            {
+                Characters.AddRange(dbCharacters);
+            }
+
+            foreach (var user in Users)
+            {
+                user.Characters.AddRange(Characters.Where(c => c.User == user));
+            }
         }
 
+        private void Reload()
+        {
+            Teams.Clear();
+            var dbTeams = DatabaseTeamApi.GetAllTeams(dbConnection);
+            if (dbTeams != null)
+            {
+                Teams.AddRange(dbTeams);
+            }
+
+            Users.Clear();
+            var dbUsers = DatabaseUserApi.GetAllUsers(dbConnection, Teams);
+            if (dbUsers != null)
+            {
+                Users.AddRange(dbUsers);
+            }
+
+            Characters.Clear();
+            var dbCharacters = DatabaseCharacterApi.GetAllCharacters(dbConnection, Users);
+            if (dbCharacters != null)
+            {
+                Characters.AddRange(dbCharacters);
+            }
+
+            foreach (var user in Users)
+            {
+                user.Characters.AddRange(Characters.Where(c => c.User == user));
+            }
+        }
+        
         private User GetUserByTcpClient(TcpClient client)
         {
             return loggedInUser[client];
         }
 
-        private Character GetCharacterById(int id, User user)
+        private Character GetCharacterById(int id)
         {
-            return user.Characters.FirstOrDefault(c => id == c.Id);
+            return Characters.FirstOrDefault(c => id == c.Id);
         }
     }
 }

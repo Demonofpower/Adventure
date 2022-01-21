@@ -39,70 +39,70 @@ namespace Adv.Server.Util.Database.API
         }
 
 
-        public static User GetUserByName(string name, DatabaseConnection connection)
-        {
-            var result = connection.ExecuteQuery(@"SELECT * from adventure.users WHERE username = @username",
-                new Tuple<string, object>("@username", name));
+        //public static User GetUserByName(string name, DatabaseConnection connection)
+        //{
+        //    var result = connection.ExecuteQuery(@"SELECT * from adventure.users WHERE username = @username",
+        //        new Tuple<string, object>("@username", name));
 
-            try
-            {
-                while (result.Read())
-                {
-                    var id = result.GetInt32("id");
-                    var password = result.GetString("password");
-                    var isAdmin = result.GetBoolean("isAdmin");
-                    result.Close();
+        //    try
+        //    {
+        //        while (result.Read())
+        //        {
+        //            var id = result.GetInt32("id");
+        //            var password = result.GetString("password");
+        //            var isAdmin = result.GetBoolean("isAdmin");
+        //            result.Close();
 
-                    var team = DatabaseTeamApi.GetTeamById(result.GetInt32("team"), connection);
+        //            var team = DatabaseTeamApi.GetTeamById(result.GetInt32("team"), connection);
 
-                    return new User(name, password, team, isAdmin, new List<Character>(), id);
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
+        //            return new User(name, password, team, isAdmin, new List<Character>(), id);
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.WriteLine(e.Message);
+        //    }
 
-            result.Close();
-            return null;
-        }
+        //    result.Close();
+        //    return null;
+        //}
 
-        public static User GetUserById(int id, DatabaseConnection connection)
-        {
-            var result = connection.ExecuteQuery(@"SELECT * from adventure.users WHERE id = @id",
-                new Tuple<string, object>("@id", id));
+        //public static User GetUserById(int id, DatabaseConnection connection)
+        //{
+        //    var result = connection.ExecuteQuery(@"SELECT * from adventure.users WHERE id = @id",
+        //        new Tuple<string, object>("@id", id));
 
-            try
-            {
-                while (result.Read())
-                {
-                    var username = result.GetString("username");
-                    var password = result.GetString("password");
-                    var isAdmin = result.GetBoolean("isAdmin");
-                    result.Close();
+        //    try
+        //    {
+        //        while (result.Read())
+        //        {
+        //            var username = result.GetString("username");
+        //            var password = result.GetString("password");
+        //            var isAdmin = result.GetBoolean("isAdmin");
+        //            result.Close();
 
-                    var team = DatabaseTeamApi.GetTeamById(result.GetInt32("team"), connection);
+        //            var team = DatabaseTeamApi.GetTeamById(result.GetInt32("team"), connection);
 
-                    return new User(username, password, team, isAdmin, new List<Character>(), id);
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
+        //            return new User(username, password, team, isAdmin, new List<Character>(), id);
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.WriteLine(e.Message);
+        //    }
 
-            result.Close();
-            return null;
-        }
+        //    result.Close();
+        //    return null;
+        //}
 
-        public static bool AddUser(User user, DatabaseConnection connection)
+        public static bool AddUser(User user, List<Team> teams, DatabaseConnection connection)
         {
             if (user.Characters.Any())
             {
                 throw new NotSupportedException("Add the user first before characters!");
             }
-            
-            var team = DatabaseTeamApi.GetTeamBySecretName(user.Team.SecretTeamName, connection);
+
+            var team = teams.FirstOrDefault(t => t.SecretTeamName == user.Team.SecretTeamName);
 
             var cmdText =
                 @"INSERT INTO adventure.users(username,password,isAdmin,team) VALUES(@username, @password, @isAdmin, @team)";
@@ -113,11 +113,11 @@ namespace Adv.Server.Util.Database.API
 
             if (team == null)
             {
-                team = DatabaseTeamApi.GetTeamByName(user.Team.TeamName, connection);
+                team = teams.FirstOrDefault(t => t.TeamName == user.Team.TeamName);
                 if (team == null)
                 {
                     DatabaseTeamApi.AddTeam(new Team(user.Team.TeamName, user.Team.SecretTeamName), connection);
-                    team = DatabaseTeamApi.GetTeamByName(user.Team.TeamName, connection);
+                    team = DatabaseTeamApi.GetAllTeams(connection).First(t => t.TeamName == user.Team.TeamName);
                 }
                 else
                 {

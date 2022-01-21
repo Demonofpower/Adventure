@@ -33,82 +33,82 @@ namespace Adv.Server.Util.Database.API
             return list.Any() ? list : null;
         }
 
-        public static Team GetTeamByName(string teamName, DatabaseConnection connection)
-        {
-            var result = connection.ExecuteQuery(@"SELECT * from adventure.teams WHERE name = @name",
-                new Tuple<string, object>("@name", teamName));
+        //public static Team GetTeamByName(string teamName, DatabaseConnection connection)
+        //{
+        //    var result = connection.ExecuteQuery(@"SELECT * from adventure.teams WHERE name = @name",
+        //        new Tuple<string, object>("@name", teamName));
 
-            try
-            {
-                while (result.Read())
-                {
-                    var id = result.GetInt32("id");
-                    var name = result.GetString("name");
-                    var secretName = result.GetString("secretName");
+        //    try
+        //    {
+        //        while (result.Read())
+        //        {
+        //            var id = result.GetInt32("id");
+        //            var name = result.GetString("name");
+        //            var secretName = result.GetString("secretName");
 
-                    result.Close();
-                    return new Team(name, secretName, id);
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
+        //            result.Close();
+        //            return new Team(name, secretName, id);
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.WriteLine(e.Message);
+        //    }
 
-            result.Close();
-            return null;
-        }
+        //    result.Close();
+        //    return null;
+        //}
 
-        public static Team GetTeamBySecretName(string secretTeamName, DatabaseConnection connection)
-        {
-            var result = connection.ExecuteQuery(@"SELECT * from adventure.teams WHERE secretName = @secretTeamName",
-                new Tuple<string, object>("@secretTeamName", secretTeamName));
+        //public static Team GetTeamBySecretName(string secretTeamName, DatabaseConnection connection)
+        //{
+        //    var result = connection.ExecuteQuery(@"SELECT * from adventure.teams WHERE secretName = @secretTeamName",
+        //        new Tuple<string, object>("@secretTeamName", secretTeamName));
 
-            try
-            {
-                while (result.Read())
-                {
-                    var id = result.GetInt32("id");
-                    var name = result.GetString("name");
-                    var secretName = result.GetString("secretName");
+        //    try
+        //    {
+        //        while (result.Read())
+        //        {
+        //            var id = result.GetInt32("id");
+        //            var name = result.GetString("name");
+        //            var secretName = result.GetString("secretName");
 
-                    result.Close();
-                    return new Team(name, secretName, id);
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
+        //            result.Close();
+        //            return new Team(name, secretName, id);
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.WriteLine(e.Message);
+        //    }
 
-            result.Close();
-            return null;
-        }
+        //    result.Close();
+        //    return null;
+        //}
 
-        public static Team GetTeamById(int id, DatabaseConnection connection)
-        {
-            var result = connection.ExecuteQuery(@"SELECT * from adventure.teams WHERE id = @id",
-                new Tuple<string, object>("@id", id));
+        //public static Team GetTeamById(int id, DatabaseConnection connection)
+        //{
+        //    var result = connection.ExecuteQuery(@"SELECT * from adventure.teams WHERE id = @id",
+        //        new Tuple<string, object>("@id", id));
 
-            try
-            {
-                while (result.Read())
-                {
-                    var name = result.GetString("name");
-                    var secretName = result.GetString("secretName");
+        //    try
+        //    {
+        //        while (result.Read())
+        //        {
+        //            var name = result.GetString("name");
+        //            var secretName = result.GetString("secretName");
 
-                    result.Close();
-                    return new Team(name, secretName, id);
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
+        //            result.Close();
+        //            return new Team(name, secretName, id);
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.WriteLine(e.Message);
+        //    }
 
-            result.Close();
-            return null;
-        }
+        //    result.Close();
+        //    return null;
+        //}
 
         public static bool AddTeam(Team team, DatabaseConnection connection)
         {

@@ -14,10 +14,10 @@ namespace Adv.Server.Master
         public int ColorD { get; set; }
         public int Flags { get; set; }
         public bool IsAdmin { get; set; }
+        public User User { get; set; }
 
-        public Character(int id, string name, Location location, byte avatar, int colorA, int colorB, int colorC, int colorD, int flags, bool isAdmin)
+        public Character(string name, Location location, byte avatar, int colorA, int colorB, int colorC, int colorD, int flags, bool isAdmin, User user, int id = 0)
         {
-            Id = id;
             Name = name;
             Location = location;
             Avatar = avatar;
@@ -27,6 +27,8 @@ namespace Adv.Server.Master
             ColorD = colorD;
             Flags = flags;
             IsAdmin = isAdmin;
+            User = user;
+            Id = id;
         }
     }
 }
