@@ -150,7 +150,10 @@ namespace Adv.Server
                 case GamePacketType.OnPlayerItemEvent:
                     break;
                 case GamePacketType.OnCurrentSlotEvent:
-                    break;
+                    var clientSlotPacket = GameConnectionApi.ProcessClientSlotPacket(ref packet);
+                    Console.WriteLine("SlotPacket - slot: " + clientSlotPacket.Slot);
+
+                    return GameConnectionApi.CreateServerSlotPacket(clientSlotPacket.Slot);
                 case GamePacketType.OnEquipItemEvent:
                     break;
                 case GamePacketType.OnCircuitOutputEvent:

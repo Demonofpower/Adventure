@@ -100,5 +100,26 @@ namespace Adv.Server.Game
 
             return clientSprintPacket;
         }
+
+        public static ClientSlotPacket ProcessClientSlotPacket(ref Span<byte> packet)
+        {
+            var clientSlotPacket = new ClientSlotPacket(packet.ToArray().ToList());
+
+            clientSlotPacket.Slot = PacketProcessor.Read8(ref packet);
+
+            return clientSlotPacket;
+        }
+
+        public static byte[] CreateServerSlotPacket(byte slot)
+        {
+            var packet = new List<byte>();
+            
+            packet.Write8(0x73);
+            packet.Write8(0x3d);
+
+            packet.Write8(slot);
+
+            return packet.ToArray();
+        }
     }
 }
