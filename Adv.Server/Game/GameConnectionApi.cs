@@ -91,5 +91,14 @@ namespace Adv.Server.Game
 
             return clientJumpPacket;
         }
+
+        public static ClientSprintPacket ProcessClientSprintPacket(ref Span<byte> packet)
+        {
+            var clientSprintPacket = new ClientSprintPacket(packet.ToArray().ToList());
+
+            clientSprintPacket.SprintState = PacketProcessor.Read8(ref packet);
+
+            return clientSprintPacket;
+        }
     }
 }

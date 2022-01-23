@@ -202,7 +202,10 @@ namespace Adv.Server
                 case GamePacketType.Teleport:
                     break;
                 case GamePacketType.Sprint:
-                    break;
+                    var clientSprintPacket = GameConnectionApi.ProcessClientSprintPacket(ref packet);
+                    Console.WriteLine("SprintPacket - state: " + clientSprintPacket.SprintState);
+
+                    return null;
                 case GamePacketType.Jump:
                     var clientJumpPacket = GameConnectionApi.ProcessClientJumpPacket(ref packet);
                     Console.WriteLine("JumpPacket - state: " + clientJumpPacket.JumpState);
