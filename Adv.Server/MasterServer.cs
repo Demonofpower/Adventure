@@ -23,19 +23,19 @@ namespace Adv.Server
         public static List<Quest> Quests;
         public static List<Item> Items;
         public static List<Achievement> Achievements;
-        
+
         private Dictionary<TcpClient, User> loggedInUser;
 
         private DatabaseConnection dbConnection = null;
 
         private static X509Certificate serverCertificate;
-        
+
         public void Start(int port, string certificate, DatabaseConnection dbConnection)
         {
             this.dbConnection = dbConnection;
-            
+
             Populate();
-            
+
             serverCertificate = X509Certificate.CreateFromSignedFile(certificate);
 
             TcpListener listener = new TcpListener(IPAddress.Any, port);
@@ -62,7 +62,7 @@ namespace Adv.Server
 
                 var buffer = MasterConnectionApi.CreateWelcomePacket(5, "Custom Server", "By Paranoia with <3");
                 sslStream.Write(buffer);
-                
+
                 while (true)
                 {
                     List<byte> packet = ReadMessage(sslStream);
@@ -92,7 +92,7 @@ namespace Adv.Server
                 client.Close();
             }
         }
-        
+
         private List<byte> ReadMessage(SslStream sslStream)
         {
             byte[] buffer = new byte[2048];
@@ -115,8 +115,9 @@ namespace Adv.Server
             {
                 case MasterPacketType.Login:
                     var clientLoginPacket = MasterConnectionApi.ProcessClientLoginPacket(packet);
-                    Console.WriteLine($"UserLogin - User: {clientLoginPacket.Username} PW: {clientLoginPacket.Password}");
-                    
+                    Console.WriteLine(
+                        $"UserLogin - User: {clientLoginPacket.Username} PW: {clientLoginPacket.Password}");
+
                     var user = Users.FirstOrDefault(u =>
                         u.Username == clientLoginPacket.Username && u.Password == clientLoginPacket.Password);
 
@@ -133,10 +134,12 @@ namespace Adv.Server
                     return MasterConnectionApi.CreateServerLoginPacket(user);
                 case MasterPacketType.Register:
                     var clientRegisterPacket = MasterConnectionApi.ProcessClientRegisterPacket(packet);
-                    Console.WriteLine($"UserRegister - Name: {clientRegisterPacket.Username} Team: {clientRegisterPacket.TeamNameOrHash} Pw: {clientRegisterPacket.Password}");
+                    Console.WriteLine(
+                        $"UserRegister - Name: {clientRegisterPacket.Username} Team: {clientRegisterPacket.TeamNameOrHash} Pw: {clientRegisterPacket.Password}");
 
                     var team = new Team(clientRegisterPacket.TeamNameOrHash, clientRegisterPacket.TeamNameOrHash);
-                    var newUser = new User(clientRegisterPacket.Username, clientRegisterPacket.Password, team, false, new List<Character>());
+                    var newUser = new User(clientRegisterPacket.Username, clientRegisterPacket.Password, team, false,
+                        new List<Character>());
                     var addUserResult = DatabaseUserApi.AddUser(newUser, Teams, dbConnection);
 
                     Reload();
@@ -148,42 +151,49 @@ namespace Adv.Server
                     }
                     else
                     {
-                        return MasterConnectionApi.CreateServerRegisterPacket(null, "An error occurred while creating your account!");
+                        return MasterConnectionApi.CreateServerRegisterPacket(null,
+                            "An error occurred while creating your account!");
                     }
                 case MasterPacketType.GetPlayerCounts:
-                    return MasterConnectionApi.CreateServerPlayerCountPacket();
+                    return MasterConnectionApi.CreateServerPlayerCountPacket(
+                        loggedInUser.Count(u => u.Value != null && u.Value.Team.Id == currentUser.Team.Id) - 1,
+                        loggedInUser.Count(u => u.Value != null));
                 case MasterPacketType.GetTeammates:
                     break;
                 case MasterPacketType.CharacterList:
                     return MasterConnectionApi.CreateServerCharacterListPacket(currentUser);
                 case MasterPacketType.CreateCharacter:
                     var clientCreateCharacterPacket = MasterConnectionApi.ProcessClientCreateCharacterPacket(packet);
-                    Console.WriteLine($"CreateCharacter - Name: {clientCreateCharacterPacket.Name} User: {currentUser.Username}");
+                    Console.WriteLine(
+                        $"CreateCharacter - Name: {clientCreateCharacterPacket.Name} User: {currentUser.Username}");
 
 
                     var character = new Character(clientCreateCharacterPacket.Name, Location.TODO,
                         clientCreateCharacterPacket.Avatar, clientCreateCharacterPacket.ColorA,
                         clientCreateCharacterPacket.ColorB, clientCreateCharacterPacket.ColorC,
                         clientCreateCharacterPacket.ColorD, 0, false, currentUser);
-                    
+
                     var createCharacterResult = DatabaseCharacterApi.AddCharacter(character, dbConnection);
-                    
+
                     Reload();
-                    
+
                     if (createCharacterResult)
                     {
-                        return MasterConnectionApi.CreateServerCreateCharacterPacket(Characters.First(c => c.Name == character.Name));
+                        return MasterConnectionApi.CreateServerCreateCharacterPacket(
+                            Characters.First(c => c.Name == character.Name));
                     }
                     else
                     {
-                        return MasterConnectionApi.CreateServerCreateCharacterPacket(null, "An error occurred while creating your character!");
+                        return MasterConnectionApi.CreateServerCreateCharacterPacket(null,
+                            "An error occurred while creating your character!");
                     }
                 case MasterPacketType.DeleteCharacter:
                     break;
                 case MasterPacketType.JoinGameServer:
-                    var clientJoinGameServerPacket = MasterConnectionApi.ProcessClientJoinGameServerPacket(packet.ToArray());
+                    var clientJoinGameServerPacket =
+                        MasterConnectionApi.ProcessClientJoinGameServerPacket(packet.ToArray());
                     currentCharacter = GetCharacterById(clientJoinGameServerPacket.CharacterId);
-                    
+
                     return MasterConnectionApi.CreateServerJoinGameServerPacket(currentUser, currentCharacter);
                 case MasterPacketType.ValidateCharacterToken:
                     break;
@@ -224,8 +234,8 @@ namespace Adv.Server
             loggedInUser = new Dictionary<TcpClient, User>();
 
             Quests = new List<Quest>();
-            Quests.Add(new Quest() { Name = "LostCave" });
-            
+            Quests.Add(new Quest() {Name = "LostCave"});
+
             Items = new List<Item>();
             Achievements = new List<Achievement>();
 
@@ -284,7 +294,7 @@ namespace Adv.Server
                 user.Characters.AddRange(Characters.Where(c => c.User == user));
             }
         }
-        
+
         private User GetUserByTcpClient(TcpClient client)
         {
             return loggedInUser[client];

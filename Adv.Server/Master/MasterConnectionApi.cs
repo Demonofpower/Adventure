@@ -109,14 +109,12 @@ namespace Adv.Server.Master
             return buffer.ToArray();
         }
 
-        public static byte[] CreateServerPlayerCountPacket()
+        public static byte[] CreateServerPlayerCountPacket(int teammatesCount, int totalCount)
         {
             var buffer = new List<byte>();
-
-            //TODO!!!
-            buffer.Write32(69);
-            //TODO!!!
-            buffer.Write32(420);
+            
+            buffer.Write32(teammatesCount);
+            buffer.Write32(totalCount);
 
             return buffer.ToArray();
         }
