@@ -90,6 +90,7 @@ namespace Adv.Server
             {
                 sslStream.Close();
                 client.Close();
+                loggedInUser.Remove(client);
             }
         }
 

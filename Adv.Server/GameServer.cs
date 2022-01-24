@@ -54,7 +54,7 @@ namespace Adv.Server
                         var pos = new Vector3(-54150f, -56283f, 1000);
                         var rot = new Rotation(0, 0, 0);
 
-                        var helloReply = GameConnectionApi.CreateServerHelloPacket(pos, rot);
+                        var helloReply = GameConnectionApi.CreateServerHelloPacket(clientHelloPacket.CharacterId, pos, rot);
                         networkStream.Write(helloReply);
                         
                         continue;
@@ -98,6 +98,7 @@ namespace Adv.Server
             {
                 networkStream.Close();
                 client.Close();
+                sessions.Remove(client);
             }
         }
 

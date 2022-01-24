@@ -20,12 +20,11 @@ namespace Adv.Server.Game
             return clientHelloPacket;
         }
 
-        public static byte[] CreateServerHelloPacket(Vector3 position, Rotation rotation)
+        public static byte[] CreateServerHelloPacket(int charId, Vector3 position, Rotation rotation)
         {
             var packet = new List<byte>();
-
-            //TODO!!! actorId 0x2bad7
-            packet.Write32(1);
+            
+            packet.Write32(charId);
 
             packet.WriteVector3(position);
             packet.WriteRotation(rotation);
