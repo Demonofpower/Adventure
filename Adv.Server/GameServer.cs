@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Numerics;
+using System.Threading;
 using Adv.Server.Game;
 using Adv.Server.Master;
 using Adv.Server.Packets;
@@ -24,9 +25,8 @@ namespace Adv.Server
             listener.Start();
             while (true)
             {
-                Console.WriteLine("Waiting for a client to connect...");
                 TcpClient client = listener.AcceptTcpClient();
-                ProcessClient(client);
+                new Thread(() => ProcessClient(client)).Start();
             }
         }
 
