@@ -64,11 +64,25 @@ namespace Adv.Server
 
                     while (arrayPacket[0] != 0)
                     {
-                        var reply = GetNewMessageAndCraftAnswer(ref arrayPacket, client);
-
+                        var replyCmd = GetNewMessageAndCraftAnswer(ref arrayPacket, client);
+                        var reply = replyCmd.Item1;
+                        var isBroadcast = replyCmd.Item2;
+                        
                         if (reply == null || reply.Length == 0) continue;
 
-                        networkStream.Write(reply);
+                        if (!isBroadcast)
+                        {
+
+                            networkStream.Write(reply);
+                        }
+                        else
+                        {
+                            foreach (var sessionsClient in sessions.Keys)
+                            {
+                                var clientStream = sessionsClient.GetStream();
+                                clientStream.Write(reply);
+                            }
+                        }
                     }
                 }
             }
@@ -99,7 +113,7 @@ namespace Adv.Server
             return buffer.ToList();
         }
 
-        private byte[] GetNewMessageAndCraftAnswer(ref Span<byte> packet, TcpClient client)
+        private (byte[], bool) GetNewMessageAndCraftAnswer(ref Span<byte> packet, TcpClient client)
         {
             var currentCharacter = sessions[client]?.Item2;
             PacketProcessor.SwitchPacketIdEndian(ref packet);
@@ -146,7 +160,7 @@ namespace Adv.Server
                 case GamePacketType.OnPositionEvent:
                     var clientPosition = GameConnectionApi.ProcessClientPositionPacket(ref packet);
 
-                    return GameConnectionApi.CreateClientPositionPacket(clientPosition.Position, clientPosition.Rotation);
+                    return (GameConnectionApi.CreateClientPositionPacket(clientPosition.Position, clientPosition.Rotation), false);
                 case GamePacketType.OnActorDestroyEvent:
                     break;
                 case GamePacketType.OnPlayerItemEvent:
@@ -155,7 +169,7 @@ namespace Adv.Server
                     var clientSlotPacket = GameConnectionApi.ProcessClientSlotPacket(ref packet);
                     Console.WriteLine("SlotPacket - slot: " + clientSlotPacket.Slot);
 
-                    return GameConnectionApi.CreateServerSlotPacket(clientSlotPacket.Slot);
+                    return (GameConnectionApi.CreateServerSlotPacket(clientSlotPacket.Slot), false);
                 case GamePacketType.OnEquipItemEvent:
                     break;
                 case GamePacketType.OnCircuitOutputEvent:
@@ -170,7 +184,7 @@ namespace Adv.Server
                     var clientChatPacket = GameConnectionApi.ProcessClientChatPacket(ref packet);
                     Console.WriteLine($"ChatPacket - msg: {clientChatPacket.Message} + character: {currentCharacter.Name}");
 
-                    return GameConnectionApi.CreateServerChatPacket(currentCharacter.Id, clientChatPacket.Message);
+                    return (GameConnectionApi.CreateServerChatPacket(currentCharacter.Id, clientChatPacket.Message), true);
                 case GamePacketType.OnFireBulletsEvent:
                     break;
                 case GamePacketType.OnNPCShopEvent:
@@ -213,12 +227,12 @@ namespace Adv.Server
                     var clientSprintPacket = GameConnectionApi.ProcessClientSprintPacket(ref packet);
                     Console.WriteLine("SprintPacket - state: " + clientSprintPacket.SprintState);
 
-                    return null;
+                    return (null, false);
                 case GamePacketType.Jump:
                     var clientJumpPacket = GameConnectionApi.ProcessClientJumpPacket(ref packet);
                     Console.WriteLine("JumpPacket - state: " + clientJumpPacket.JumpState);
 
-                    return null;
+                    return (null, false);
                 case GamePacketType.FastTravel:
                     break;
                 case GamePacketType.SubmitDLCKey:
