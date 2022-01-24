@@ -121,5 +121,27 @@ namespace Adv.Server.Game
 
             return packet.ToArray();
         }
+
+        public static ClientChatPacket ProcessClientChatPacket(ref Span<byte> packet)
+        {
+            var clientChatPacket = new ClientChatPacket(packet.ToArray().ToList());
+
+            clientChatPacket.Message = PacketProcessor.ReadString(ref packet);
+
+            return clientChatPacket;
+        }
+
+        public static byte[] CreateServerChatPacket(int charId, string message)
+        {
+            var packet = new List<byte>();
+
+            packet.Write8(0x23);
+            packet.Write8(0x2a);
+
+            packet.Write32(charId);
+            packet.WriteString(message);
+
+            return packet.ToArray();
+        }
     }
 }

@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Numerics;
 using Adv.Server.Game;
+using Adv.Server.Master;
 using Adv.Server.Packets;
 using Adv.Server.Packets.Game;
 using Adv.Server.Util;
@@ -13,7 +14,7 @@ namespace Adv.Server
 {
     class GameServer
     {
-        private Dictionary<TcpClient, string> sessions;
+        private Dictionary<TcpClient, Tuple<string, Character>> sessions;
 
         public void Start(int port)
         {
@@ -47,7 +48,7 @@ namespace Adv.Server
                     {
                         var clientHelloPacket = GameConnectionApi.ProcessClientHelloPacket(packet.ToArray());
 
-                        sessions[client] = clientHelloPacket.SessionId;
+                        sessions[client] = new Tuple<string, Character>(clientHelloPacket.SessionId, MasterServer.Characters.First(c => c.Id == clientHelloPacket.CharacterId));
                         
                         //TODO!!
                         var pos = new Vector3(-54150f, -56283f, 1000);
@@ -100,6 +101,7 @@ namespace Adv.Server
 
         private byte[] GetNewMessageAndCraftAnswer(ref Span<byte> packet, TcpClient client)
         {
+            var currentCharacter = sessions[client]?.Item2;
             PacketProcessor.SwitchPacketIdEndian(ref packet);
             var gamePacketType = Enum.Parse<GamePacketType>(PacketProcessor.Read16(ref packet).ToString());
 
@@ -165,7 +167,10 @@ namespace Adv.Server
                 case GamePacketType.OnHealthUpdateEvent:
                     break;
                 case GamePacketType.OnChatEvent:
-                    break;
+                    var clientChatPacket = GameConnectionApi.ProcessClientChatPacket(ref packet);
+                    Console.WriteLine($"ChatPacket - msg: {clientChatPacket.Message} + character: {currentCharacter.Name}");
+
+                    return GameConnectionApi.CreateServerChatPacket(currentCharacter.Id, clientChatPacket.Message);
                 case GamePacketType.OnFireBulletsEvent:
                     break;
                 case GamePacketType.OnNPCShopEvent:
@@ -227,7 +232,7 @@ namespace Adv.Server
 
         private void Populate()
         {
-            sessions = new Dictionary<TcpClient, string>();
+            sessions = new Dictionary<TcpClient, Tuple<string, Character>>();
         }
     }
 }
