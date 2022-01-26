@@ -5,13 +5,11 @@ VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Adv.Sniffer", "Adv.Sniffer\Adv.Sniffer.csproj", "{A58899A2-2C18-482E-8399-A2B18AC4F71A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Adv.Comparer", "Adv.Comparer\Adv.Comparer.csproj", "{5C56629E-BFED-49E5-908B-2846BD65F7A6}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Adv.Spy", "Adv.Spy\Adv.Spy.vcxproj", "{967CC740-6D00-4ABB-9B66-0E5CC7C4D700}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Adv.Agency", "Adv.Agency\Adv.Agency.vcxproj", "{DA180D21-C0B7-4F69-B296-89425840868D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Adv.Server", "Adv.Server\Adv.Server.csproj", "{A41B53A6-CBEE-4391-AF7E-2B6D24572E9E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Adv.Server", "Adv.Server\Adv.Server.csproj", "{A41B53A6-CBEE-4391-AF7E-2B6D24572E9E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,18 +33,6 @@ Global
 		{A58899A2-2C18-482E-8399-A2B18AC4F71A}.Release|x64.Build.0 = Release|Any CPU
 		{A58899A2-2C18-482E-8399-A2B18AC4F71A}.Release|x86.ActiveCfg = Release|Any CPU
 		{A58899A2-2C18-482E-8399-A2B18AC4F71A}.Release|x86.Build.0 = Release|Any CPU
-		{5C56629E-BFED-49E5-908B-2846BD65F7A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5C56629E-BFED-49E5-908B-2846BD65F7A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5C56629E-BFED-49E5-908B-2846BD65F7A6}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{5C56629E-BFED-49E5-908B-2846BD65F7A6}.Debug|x64.Build.0 = Debug|Any CPU
-		{5C56629E-BFED-49E5-908B-2846BD65F7A6}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{5C56629E-BFED-49E5-908B-2846BD65F7A6}.Debug|x86.Build.0 = Debug|Any CPU
-		{5C56629E-BFED-49E5-908B-2846BD65F7A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5C56629E-BFED-49E5-908B-2846BD65F7A6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5C56629E-BFED-49E5-908B-2846BD65F7A6}.Release|x64.ActiveCfg = Release|Any CPU
-		{5C56629E-BFED-49E5-908B-2846BD65F7A6}.Release|x64.Build.0 = Release|Any CPU
-		{5C56629E-BFED-49E5-908B-2846BD65F7A6}.Release|x86.ActiveCfg = Release|Any CPU
-		{5C56629E-BFED-49E5-908B-2846BD65F7A6}.Release|x86.Build.0 = Release|Any CPU
 		{967CC740-6D00-4ABB-9B66-0E5CC7C4D700}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{967CC740-6D00-4ABB-9B66-0E5CC7C4D700}.Debug|x64.ActiveCfg = Debug|x64
 		{967CC740-6D00-4ABB-9B66-0E5CC7C4D700}.Debug|x64.Build.0 = Debug|x64

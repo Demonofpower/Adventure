@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Adv.Server.Master;
-using Adv.Server.Master.Enums;
+using Adv.Server.Util.Enums;
 
 namespace Adv.Server.Util.Database.API
 {

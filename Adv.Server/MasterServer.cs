@@ -8,11 +8,11 @@ using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using Adv.Server.Master;
-using Adv.Server.Master.Enums;
 using Adv.Server.Packets;
 using Adv.Server.Packets.Master;
 using Adv.Server.Util.Database;
 using Adv.Server.Util.Database.API;
+using Adv.Server.Util.Enums;
 
 namespace Adv.Server
 {

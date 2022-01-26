@@ -1,4 +1,6 @@
-﻿using Adv.Server.Master.Enums;
+﻿using System.Numerics;
+using Adv.Server.Util;
+using Adv.Server.Util.Enums;
 
 namespace Adv.Server.Master
 {
@@ -15,6 +17,11 @@ namespace Adv.Server.Master
         public int Flags { get; set; }
         public bool IsAdmin { get; set; }
         public User User { get; set; }
+
+        public int Health { get; set; }
+        public Vector3 Position { get; set; }
+        public Rotation Rotation { get; set; }
+
 
         public Character(string name, Location location, byte avatar, int colorA, int colorB, int colorC, int colorD, int flags, bool isAdmin, User user, int id = 0)
         {

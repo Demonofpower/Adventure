@@ -98,14 +98,14 @@ namespace PacketChecker
 		//	return;
 		//}
 
-		/*if (*((WORD*)buffer) == *(WORD*)"\x6d\x76")
-		{
-			return;
-		}
-		if (*((WORD*)buffer) == *(WORD*)"\x52\x48")
-		{
-			return;
-		}*/
+		//if (*((WORD*)buffer) == *(WORD*)"\x6d\x76")
+		//{
+		//	return;
+		//}
+		//if (*((WORD*)buffer) == *(WORD*)"\x52\x48")
+		//{
+		//	return;
+		//}
 
 		auto knownPackets = GetPackedIds();
 

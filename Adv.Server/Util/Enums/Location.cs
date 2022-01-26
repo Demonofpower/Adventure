@@ -1,4 +1,4 @@
-﻿namespace Adv.Server.Master.Enums
+﻿namespace Adv.Server.Util.Enums
 {
     public enum Location
     {

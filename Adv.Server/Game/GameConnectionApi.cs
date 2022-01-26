@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using Adv.Server.Master;
 using Adv.Server.Packets;
 using Adv.Server.Packets.Game;
 using Adv.Server.Util;
+using Adv.Server.Util.Enums;
 
 namespace Adv.Server.Game
 {
@@ -44,7 +46,7 @@ namespace Adv.Server.Game
             return clientPlayerPositionPacket;
         }
 
-        public static byte[] CreateClientPositionPacket(Vector3 position, Rotation rotation)
+        public static byte[] CreateClientPositionPacket(int charId, Vector3 position, Rotation rotation)
         {
             var packet = new List<byte>();
 
@@ -53,7 +55,7 @@ namespace Adv.Server.Game
             packet.Write8(0x76);
             
             //PLAYERID??
-            packet.Write32(0x1);
+            packet.Write32(charId);
             
             packet.WriteVector3(position);
             packet.WriteRotation(rotation);
@@ -71,10 +73,10 @@ namespace Adv.Server.Game
             packet.Write8(0x6d);
             packet.Write8(0x6b);
 
-            packet.Write32(0x1);
+            packet.Write32(0x0);
             packet.Write32(0x0);
             packet.Write8(0x0);
-            packet.WriteString("GreatBallsOfFire");
+            packet.WriteString("Actor");
             packet.WriteVector3(position);
             packet.WriteRotation(rotation);
             packet.Write32(0x0);
@@ -139,6 +141,45 @@ namespace Adv.Server.Game
 
             packet.Write32(charId);
             packet.WriteString(message);
+
+            return packet.ToArray();
+        }
+
+        public static byte[] CreateServerPlayerJoinedPacket(Character character)
+        {
+            var packet = new List<byte>();
+
+            packet.Write8(0x6e);
+            packet.Write8(0x63);
+
+            packet.Write32(character.Id);
+            packet.WriteString(character.Name);
+            packet.WriteString(character.User.Team.TeamName);
+            packet.Write8(character.Avatar);
+            packet.Write32(character.ColorA);
+            packet.Write32(character.ColorB);
+            packet.Write32(character.ColorC);
+            packet.Write32(character.ColorD);
+            packet.WriteVector3(character.Position);
+            packet.WriteRotation(character.Rotation);
+            
+            //UNKNOWN
+            packet.WriteString("xxx");
+
+            packet.Write32(character.Health);
+            
+            //UNKNOWN!!!
+            short x = 0x0;
+            packet.Write16(x);
+            if (x > 0)
+            {
+                while (false)
+                {
+                    packet.WriteString("yyy");
+                    packet.Write8(character.Avatar);
+                }
+            }
+            
 
             return packet.ToArray();
         }
