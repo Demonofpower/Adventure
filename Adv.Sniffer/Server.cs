@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using Adv.Sniffer.Enums;
 
 namespace Adv.Sniffer
 {
@@ -10,10 +11,12 @@ namespace Adv.Sniffer
         private string name;
 
         private TcpListener m_vServer;
-        
+
         private Client m_vClient;
-        
-        public Server(string myAddress, int localPort, string remoteAddress, int remotePort, bool output = false, string name = "")
+
+        private ServerType type;
+
+        public Server(string myAddress, int localPort, string remoteAddress, int remotePort, ServerType type, bool output = false, string name = "")
         {
             // Setup class defaults..
             this.LocalAddress = myAddress;
@@ -23,8 +26,10 @@ namespace Adv.Sniffer
 
             this.output = output;
             this.name = name;
+
+            this.type = type;
         }
-        
+
         public bool Start()
         {
             try
@@ -94,7 +99,7 @@ namespace Adv.Sniffer
                     this.m_vClient.Stop();
 
                 // Prepare the client and start the proxying..
-                this.m_vClient = new Client(tcpClient.Client, output, name);
+                this.m_vClient = new Client(tcpClient.Client, output, name, type);
                 this.m_vClient.Start(this.RemoteAddress, this.RemotePort);
             }
             catch

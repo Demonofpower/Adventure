@@ -58,6 +58,13 @@ namespace Adv.Server
                         networkStream.Write(helloReply);
 
                         SendToAllExceptClient(GameConnectionApi.CreateServerPlayerJoinedPacket(sessions[client].Item2), client);
+                        foreach (var session in sessions)
+                        {
+                            if (session.Key != client)
+                            {
+                                networkStream.Write(GameConnectionApi.CreateServerPlayerJoinedPacket(session.Value.Item2));
+                            }
+                        }
                         
                         //var testActor = GameConnectionApi.CreateActorSpawnPacket(pos, rot);
                         //networkStream.Write(testActor);
@@ -169,7 +176,9 @@ namespace Adv.Server
                     currentCharacter.Position = clientPosition.Position;
                     currentCharacter.Rotation = clientPosition.Rotation;
 
-                    return (GameConnectionApi.CreateClientPositionPacket(currentCharacter.Id, clientPosition.Position, clientPosition.Rotation), true);
+                    SendToAllExceptClient(GameConnectionApi.CreateServerPlayerPositionPacket(currentCharacter), client);
+                    
+                    return (GameConnectionApi.CreateServerPositionPacket(currentCharacter.Id, clientPosition.Position, clientPosition.Rotation), false);
                 case GamePacketType.OnActorDestroyEvent:
                     break;
                 case GamePacketType.OnPlayerItemEvent:

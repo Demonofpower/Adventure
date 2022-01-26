@@ -25,7 +25,7 @@ namespace Adv.Server.Game
         public static byte[] CreateServerHelloPacket(int charId, Vector3 position, Rotation rotation)
         {
             var packet = new List<byte>();
-            
+
             packet.Write32(charId);
 
             packet.WriteVector3(position);
@@ -46,17 +46,17 @@ namespace Adv.Server.Game
             return clientPlayerPositionPacket;
         }
 
-        public static byte[] CreateClientPositionPacket(int charId, Vector3 position, Rotation rotation)
+        public static byte[] CreateServerPositionPacket(int charId, Vector3 position, Rotation rotation)
         {
             var packet = new List<byte>();
 
             //PACKETID
             packet.Write8(0x6d);
             packet.Write8(0x76);
-            
+
             //PLAYERID??
             packet.Write32(charId);
-            
+
             packet.WriteVector3(position);
             packet.WriteRotation(rotation);
 
@@ -114,7 +114,7 @@ namespace Adv.Server.Game
         public static byte[] CreateServerSlotPacket(byte slot)
         {
             var packet = new List<byte>();
-            
+
             packet.Write8(0x73);
             packet.Write8(0x3d);
 
@@ -162,12 +162,12 @@ namespace Adv.Server.Game
             packet.Write32(character.ColorD);
             packet.WriteVector3(character.Position);
             packet.WriteRotation(character.Rotation);
-            
+
             //UNKNOWN
-            packet.WriteString("xxx");
+            packet.WriteString("");
 
             packet.Write32(character.Health);
-            
+
             //UNKNOWN!!!
             short x = 0x0;
             packet.Write16(x);
@@ -179,7 +179,29 @@ namespace Adv.Server.Game
                     packet.Write8(character.Avatar);
                 }
             }
-            
+
+
+            return packet.ToArray();
+        }
+
+        public static byte[] CreateServerPlayerPositionPacket(Character character)
+        {
+            var packet = new List<byte>();
+
+            packet.Write8(0x70);
+            packet.Write8(0x70);
+
+            packet.Write32(character.Id);
+            packet.WriteVector3(character.Position);
+            packet.WriteRotation(character.Rotation);
+
+            //UNKNOWN
+            packet.Write16(0x0);
+            packet.Write16(0x0);
+            packet.Write16(0x0);
+            packet.Write8(0x0);
+            packet.Write8(0x0);
+
 
             return packet.ToArray();
         }

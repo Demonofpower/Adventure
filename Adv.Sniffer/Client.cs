@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.RegularExpressions;
 using Adv.Sniffer.Enums;
 
 namespace Adv.Sniffer
 {
     class Client
     {
+        private ServerType type;
+        
         private PacketReverser reverser;
         private string name;
         private bool output;
@@ -27,7 +30,7 @@ namespace Adv.Sniffer
         private Byte[] m_vServerBuffer;
         private List<Byte> m_vServerBacklog;
         
-        public Client(Socket sockClient, bool output, string name)
+        public Client(Socket sockClient, bool output, string name, ServerType type)
         {
             // Setup class defaults..
             this.m_vClientSocket = sockClient;
@@ -41,6 +44,8 @@ namespace Adv.Sniffer
             this.output = output;
             this.name = name;
             reverser = new PacketReverser(name);
+
+            this.type = type;
         }
         
         public bool Start(String remoteTarget = "127.0.0.1", Int32 remotePort = 7777)
@@ -211,8 +216,7 @@ namespace Adv.Sniffer
             Byte[] btRecvData = new Byte[nRecvCount];
             Array.Copy(this.m_vClientBuffer, 0, btRecvData, 0, nRecvCount);
             
-            Console.ForegroundColor = ConsoleColor.Green;
-            if (Catch(HexArithmetic.ByteArrayToString(btRecvData), Sender.Client))
+            if (Catch(HexArithmetic.ByteArrayToString(btRecvData), Sender.Client, type))
             {
                 // Send the packet to the server..
                 this.SendToServer(btRecvData);
@@ -258,9 +262,8 @@ namespace Adv.Sniffer
             // Read the current packet..
             Byte[] btRecvData = new Byte[nRecvCount];
             Array.Copy(this.m_vServerBuffer, 0, btRecvData, 0, nRecvCount);
-
-            Console.ForegroundColor = ConsoleColor.Red;
-            Catch(HexArithmetic.ByteArrayToString(btRecvData), Sender.Server);
+            
+            Catch(HexArithmetic.ByteArrayToString(btRecvData), Sender.Server, type);
             // Send the packet to the client..
             this.SendToClient(btRecvData);
 
@@ -338,12 +341,32 @@ namespace Adv.Sniffer
             }
         }
 
-        private bool Catch(string data, Sender sender)
+        private bool Catch(string data, Sender sender, ServerType type)
         {
-            if (output)
+            if (type == ServerType.Game)
             {
-                return reverser.Reverse(data, sender, this);        
+                Console.Write("[Game] ");
             }
+            else
+            {
+                Console.Write("[Master] ");
+            }
+            
+            if (sender == Sender.Server)
+            {
+                Console.Write("--> ");
+            }
+            else
+            {
+                Console.Write("<-- ");
+            }
+
+            Console.WriteLine(Regex.Replace(data, ".{2}", "$0 "));
+            
+            //if (output)
+            //{
+            //    return reverser.Reverse(data, sender, this);        
+            //}
 
             return true;
         }
