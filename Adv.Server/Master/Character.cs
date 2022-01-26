@@ -36,6 +36,9 @@ namespace Adv.Server.Master
             IsAdmin = isAdmin;
             User = user;
             Id = id;
+
+            //TODO
+            Health = 100;
         }
     }
 }

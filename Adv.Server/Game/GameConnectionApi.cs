@@ -155,11 +155,13 @@ namespace Adv.Server.Game
             packet.Write32(character.Id);
             packet.WriteString(character.Name);
             packet.WriteString(character.User.Team.TeamName);
+            
             packet.Write8(character.Avatar);
             packet.Write32(character.ColorA);
             packet.Write32(character.ColorB);
             packet.Write32(character.ColorC);
             packet.Write32(character.ColorD);
+            
             packet.WriteVector3(character.Position);
             packet.WriteRotation(character.Rotation);
 
@@ -201,6 +203,10 @@ namespace Adv.Server.Game
             packet.Write16(0x0);
             packet.Write8(0x0);
             packet.Write8(0x0);
+            
+            //???
+            //packet.Write8(0x0);
+            //packet.Write8(0x0);
 
 
             return packet.ToArray();
