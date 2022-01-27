@@ -203,11 +203,21 @@ namespace Adv.Server.Game
             packet.Write16(0x0);
             packet.Write8(0x0);
             packet.Write8(0x0);
-            
-            //???
-            //packet.Write8(0x0);
-            //packet.Write8(0x0);
 
+
+            return packet.ToArray();
+        }
+
+        public static byte[] CreateServerStatePacket(int charId, State state, byte value)
+        {
+            var packet = new List<byte>();
+
+            packet.Write8(0x73);
+            packet.Write8(0x74);
+
+            packet.Write32(charId);
+            packet.WriteString(state.ToString());
+            packet.Write8(value);
 
             return packet.ToArray();
         }

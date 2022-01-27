@@ -10,6 +10,7 @@ using Adv.Server.Master;
 using Adv.Server.Packets;
 using Adv.Server.Packets.Game;
 using Adv.Server.Util;
+using Adv.Server.Util.Enums;
 
 namespace Adv.Server
 {
@@ -250,6 +251,8 @@ namespace Adv.Server
                     var clientJumpPacket = GameConnectionApi.ProcessClientJumpPacket(ref packet);
                     Console.WriteLine("JumpPacket - state: " + clientJumpPacket.JumpState);
 
+                    SendToAllExceptClient(GameConnectionApi.CreateServerStatePacket(currentCharacter.Id, State.Jump, clientJumpPacket.JumpState), client);
+                    
                     return (null, false);
                 case GamePacketType.FastTravel:
                     break;

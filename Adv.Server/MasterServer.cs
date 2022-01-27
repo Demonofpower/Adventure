@@ -121,8 +121,13 @@ namespace Adv.Server
 
                     var user = Users.FirstOrDefault(u =>
                         u.Username == clientLoginPacket.Username && u.Password == clientLoginPacket.Password);
-
-                    if (user != null)
+                    
+                    if (user != null && loggedInUser.ContainsValue(user))
+                    {
+                        user = null;
+                        Console.WriteLine("User already logged in!");
+                    }
+                    else if (user != null)
                     {
                         loggedInUser[client] = user;
                         Console.WriteLine("Logged in.");
