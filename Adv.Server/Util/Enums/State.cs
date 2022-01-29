@@ -2,6 +2,7 @@
 {
     enum State
     {
-        Jump
+        Jump,
+        PvP
     }
 }

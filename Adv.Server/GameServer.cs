@@ -182,6 +182,9 @@ namespace Adv.Server
                         if (timeLeft < 0)
                         {
                             client.GetStream().Write(GameConnectionApi.CreateServerPvpEnablePacket(pvpEnablePacket.State));
+                            
+                            SendToAllExceptClient(GameConnectionApi.CreateServerStatePacket(currentCharacter.Id, State.PvP, pvpEnablePacket.State), client);
+                            
                             timer.Change(Timeout.Infinite, Timeout.Infinite);
                         }
                     }, null, 0, 1000);
