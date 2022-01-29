@@ -221,5 +221,40 @@ namespace Adv.Server.Game
 
             return packet.ToArray();
         }
+
+        public static ClientPvPEnablePacket ProcessClientPvPEnablePacket(ref Span<byte> packet)
+        {
+            var pvpEnablePacket = new ClientPvPEnablePacket(packet.ToArray().ToList());
+
+            pvpEnablePacket.State = PacketProcessor.Read8(ref packet);
+            
+            return pvpEnablePacket;
+        }
+
+        public static byte[] CreateServerPvpEnablePacket(byte state)
+        {
+            var packet = new List<byte>();
+
+            packet.Write8(0x70);
+            packet.Write8(0x76);
+
+            packet.Write8(state);
+
+            return packet.ToArray();
+        }
+
+        public static byte[] CreateServerPvpCountdownUpdatePacket(byte state, int timeLeft)
+        {
+            var packet = new List<byte>();
+
+            packet.Write8(0xe2);
+            packet.Write8(0x18);
+
+            packet.Write8(state);
+            
+            packet.Write32(timeLeft);
+
+            return packet.ToArray();
+        }
     }
 }

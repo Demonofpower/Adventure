@@ -19,6 +19,7 @@
         OnRespawnThisPlayerEvent = 0x7273,
         OnStateEvent = 0x7374,
         OnPvpEnableEvent = 0x7076,
+        OnPvpCountdownUpdateEvent = 0xe218,
         OnDisplayEvent = 0x6576,
         OnPositionEvent = 0x6d76,
         OnActorDestroyEvent = 0x7878,
@@ -32,7 +33,6 @@
         OnChatEvent = 0x232a,
         OnFireBulletsEvent = 0x2a2a,
         OnNPCShopEvent = 0x2424,
-        OnPvPCountdownUpdateEvent = 0xfff1, //TODO
         OnPlayerLeftEvent = 0x5e63,
         OnPlayerJoinedEvent = 0x6e63,
         OnManaUpdateEvent = 0xFFF4, //TODO

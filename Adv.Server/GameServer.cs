@@ -40,7 +40,7 @@ namespace Adv.Server
             {
                 networkStream.ReadTimeout = int.MaxValue;
                 networkStream.WriteTimeout = int.MaxValue;
-                
+
                 while (true)
                 {
                     List<byte> packet = ReadMessage(networkStream);
@@ -49,30 +49,34 @@ namespace Adv.Server
                     {
                         var clientHelloPacket = GameConnectionApi.ProcessClientHelloPacket(packet.ToArray());
 
-                        sessions[client] = new Tuple<string, Character>(clientHelloPacket.SessionId, MasterServer.Characters.First(c => c.Id == clientHelloPacket.CharacterId));
-                        
+                        sessions[client] = new Tuple<string, Character>(clientHelloPacket.SessionId,
+                            MasterServer.Characters.First(c => c.Id == clientHelloPacket.CharacterId));
+
                         //TODO!!
                         var pos = new Vector3(-54150f, -56283f, 1000);
                         var rot = new Rotation(0, 0, 0);
 
-                        var helloReply = GameConnectionApi.CreateServerHelloPacket(clientHelloPacket.CharacterId, pos, rot);
+                        var helloReply =
+                            GameConnectionApi.CreateServerHelloPacket(clientHelloPacket.CharacterId, pos, rot);
                         networkStream.Write(helloReply);
 
-                        SendToAllExceptClient(GameConnectionApi.CreateServerPlayerJoinedPacket(sessions[client].Item2), client);
+                        SendToAllExceptClient(GameConnectionApi.CreateServerPlayerJoinedPacket(sessions[client].Item2),
+                            client);
                         foreach (var session in sessions)
                         {
                             if (session.Key != client)
                             {
-                                networkStream.Write(GameConnectionApi.CreateServerPlayerJoinedPacket(session.Value.Item2));
+                                networkStream.Write(
+                                    GameConnectionApi.CreateServerPlayerJoinedPacket(session.Value.Item2));
                             }
                         }
-                        
+
                         //var testActor = GameConnectionApi.CreateActorSpawnPacket(pos, rot);
                         //networkStream.Write(testActor);
-                        
+
                         continue;
                     }
-                    
+
                     var arrayPacket = new Span<byte>(packet.ToArray());
 
                     while (arrayPacket[0] != 0)
@@ -80,12 +84,11 @@ namespace Adv.Server
                         var replyCmd = GetNewMessageAndCraftAnswer(ref arrayPacket, client);
                         var reply = replyCmd.Item1;
                         var isBroadcast = replyCmd.Item2;
-                        
+
                         if (reply == null || reply.Length == 0) continue;
 
                         if (!isBroadcast)
                         {
-
                             networkStream.Write(reply);
                         }
                         else
@@ -168,6 +171,23 @@ namespace Adv.Server
                 case GamePacketType.OnStateEvent:
                     break;
                 case GamePacketType.OnPvpEnableEvent:
+                    var pvpEnablePacket = GameConnectionApi.ProcessClientPvPEnablePacket(ref packet);
+
+                    int timeLeft = 5;
+                    Timer timer = null;
+                    timer = new Timer(callback =>
+                    {
+                        client.GetStream().Write(GameConnectionApi.CreateServerPvpCountdownUpdatePacket(pvpEnablePacket.State, timeLeft));
+                        timeLeft -= 1;
+                        if (timeLeft < 0)
+                        {
+                            client.GetStream().Write(GameConnectionApi.CreateServerPvpEnablePacket(pvpEnablePacket.State));
+                            timer.Change(Timeout.Infinite, Timeout.Infinite);
+                        }
+                    }, null, 0, 1000);
+
+                    return (null, false);
+                case GamePacketType.OnPvpCountdownUpdateEvent:
                     break;
                 case GamePacketType.OnDisplayEvent:
                     break;
@@ -178,8 +198,10 @@ namespace Adv.Server
                     currentCharacter.Rotation = clientPosition.Rotation;
 
                     SendToAllExceptClient(GameConnectionApi.CreateServerPlayerPositionPacket(currentCharacter), client);
-                    
-                    return (GameConnectionApi.CreateServerPositionPacket(currentCharacter.Id, clientPosition.Position, clientPosition.Rotation), false);
+
+                    return (
+                        GameConnectionApi.CreateServerPositionPacket(currentCharacter.Id, clientPosition.Position,
+                            clientPosition.Rotation), false);
                 case GamePacketType.OnActorDestroyEvent:
                     break;
                 case GamePacketType.OnPlayerItemEvent:
@@ -201,14 +223,14 @@ namespace Adv.Server
                     break;
                 case GamePacketType.OnChatEvent:
                     var clientChatPacket = GameConnectionApi.ProcessClientChatPacket(ref packet);
-                    Console.WriteLine($"ChatPacket - msg: {clientChatPacket.Message} + character: {currentCharacter.Name}");
+                    Console.WriteLine(
+                        $"ChatPacket - msg: {clientChatPacket.Message} + character: {currentCharacter.Name}");
 
-                    return (GameConnectionApi.CreateServerChatPacket(currentCharacter.Id, clientChatPacket.Message), true);
+                    return (GameConnectionApi.CreateServerChatPacket(currentCharacter.Id, clientChatPacket.Message),
+                        true);
                 case GamePacketType.OnFireBulletsEvent:
                     break;
                 case GamePacketType.OnNPCShopEvent:
-                    break;
-                case GamePacketType.OnPvPCountdownUpdateEvent:
                     break;
                 case GamePacketType.OnPlayerLeftEvent:
                     break;
@@ -251,8 +273,10 @@ namespace Adv.Server
                     var clientJumpPacket = GameConnectionApi.ProcessClientJumpPacket(ref packet);
                     Console.WriteLine("JumpPacket - state: " + clientJumpPacket.JumpState);
 
-                    SendToAllExceptClient(GameConnectionApi.CreateServerStatePacket(currentCharacter.Id, State.Jump, clientJumpPacket.JumpState), client);
-                    
+                    SendToAllExceptClient(
+                        GameConnectionApi.CreateServerStatePacket(currentCharacter.Id, State.Jump,
+                            clientJumpPacket.JumpState), client);
+
                     return (null, false);
                 case GamePacketType.FastTravel:
                     break;
