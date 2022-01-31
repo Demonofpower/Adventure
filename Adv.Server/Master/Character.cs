@@ -21,6 +21,7 @@ namespace Adv.Server.Master
         public int Health { get; set; }
         public Vector3 Position { get; set; }
         public Rotation Rotation { get; set; }
+        public bool PvPEnabled { get; set; }
 
 
         public Character(string name, Location location, byte avatar, int colorA, int colorB, int colorC, int colorD, int flags, bool isAdmin, User user, int id = 0)
@@ -36,9 +37,9 @@ namespace Adv.Server.Master
             IsAdmin = isAdmin;
             User = user;
             Id = id;
-
-            //TODO
+            
             Health = 100;
+            PvPEnabled = false;
         }
     }
 }

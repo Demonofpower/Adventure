@@ -16,6 +16,8 @@ namespace Adv.Server
 {
     class GameServer
     {
+        public static List<Actor> Actors;
+        
         private Dictionary<TcpClient, Tuple<string, Character>> sessions;
 
         public void Start(int port)
@@ -56,23 +58,22 @@ namespace Adv.Server
                         var pos = new Vector3(-54150f, -56283f, 1000);
                         var rot = new Rotation(0, 0, 0);
 
-                        var helloReply =
-                            GameConnectionApi.CreateServerHelloPacket(clientHelloPacket.CharacterId, pos, rot);
+                        var helloReply = GameConnectionApi.CreateServerHelloPacket(clientHelloPacket.CharacterId, pos, rot);
                         networkStream.Write(helloReply);
 
-                        SendToAllExceptClient(GameConnectionApi.CreateServerPlayerJoinedPacket(sessions[client].Item2),
-                            client);
+                        SendToAllExceptClient(GameConnectionApi.CreateServerPlayerJoinedPacket(sessions[client].Item2), client);
                         foreach (var session in sessions)
                         {
                             if (session.Key != client)
                             {
-                                networkStream.Write(
-                                    GameConnectionApi.CreateServerPlayerJoinedPacket(session.Value.Item2));
+                                networkStream.Write(GameConnectionApi.CreateServerPlayerJoinedPacket(session.Value.Item2));
                             }
                         }
 
-                        //var testActor = GameConnectionApi.CreateActorSpawnPacket(pos, rot);
-                        //networkStream.Write(testActor);
+                        foreach (var actor in Actors)
+                        {
+                            networkStream.Write(GameConnectionApi.CreateActorSpawnPacket(actor.Id, actor.ActorType, actor.Position, actor.Rotation));
+                        }
 
                         continue;
                     }
@@ -184,6 +185,8 @@ namespace Adv.Server
                             client.GetStream().Write(GameConnectionApi.CreateServerPvpEnablePacket(pvpEnablePacket.State));
                             
                             SendToAllExceptClient(GameConnectionApi.CreateServerStatePacket(currentCharacter.Id, State.PvP, pvpEnablePacket.State), client);
+
+                            currentCharacter.PvPEnabled = pvpEnablePacket.State != 0;
                             
                             timer.Change(Timeout.Infinite, Timeout.Infinite);
                         }
@@ -226,8 +229,12 @@ namespace Adv.Server
                     break;
                 case GamePacketType.OnChatEvent:
                     var clientChatPacket = GameConnectionApi.ProcessClientChatPacket(ref packet);
-                    Console.WriteLine(
-                        $"ChatPacket - msg: {clientChatPacket.Message} + character: {currentCharacter.Name}");
+                    Console.WriteLine($"ChatPacket - msg: {clientChatPacket.Message} + character: {currentCharacter.Name}");
+
+                    if (clientChatPacket.Message.StartsWith('!'))
+                    {
+                        ChatCommandProcessor.ProcessCommand(clientChatPacket.Message, currentCharacter);
+                    }
 
                     return (GameConnectionApi.CreateServerChatPacket(currentCharacter.Id, clientChatPacket.Message),
                         true);
@@ -254,7 +261,11 @@ namespace Adv.Server
                 case GamePacketType.OnRegionChangeEvent:
                     break;
                 case GamePacketType.Use:
-                    break;
+                    var usePacket = GameConnectionApi.ProcessClientUsePacket(ref packet);
+
+                    Console.WriteLine($"UsePacket - itemId: {usePacket.ItemId} + character: {currentCharacter.Name}");
+
+                    return (null, false);
                 case GamePacketType.TransitionToNPCState:
                     break;
                 case GamePacketType.BuyItem:
@@ -306,6 +317,10 @@ namespace Adv.Server
         private void Populate()
         {
             sessions = new Dictionary<TcpClient, Tuple<string, Character>>();
+
+            Actors = new List<Actor>();
+            
+            Actors.Add(new Actor(100, ActorType.GreatBallsOfFire, new Vector3(-43653.71f, - 55836.54f, 405.65f), new Rotation(-16384, 0, -16451)));
         }
     }
 }

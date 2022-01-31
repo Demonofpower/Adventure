@@ -65,7 +65,7 @@ namespace Adv.Server.Game
             return packet.ToArray();
         }
 
-        public static byte[] CreateActorSpawnPacket(Vector3 position, Rotation rotation)
+        public static byte[] CreateActorSpawnPacket(int actorId, ActorType actor, Vector3 position, Rotation rotation)
         {
             var packet = new List<byte>();
 
@@ -73,10 +73,10 @@ namespace Adv.Server.Game
             packet.Write8(0x6d);
             packet.Write8(0x6b);
 
-            packet.Write32(0x0);
+            packet.Write32(actorId);
             packet.Write32(0x0);
             packet.Write8(0x0);
-            packet.WriteString("Actor");
+            packet.WriteString(actor.ToString());
             packet.WriteVector3(position);
             packet.WriteRotation(rotation);
             packet.Write32(0x0);
@@ -255,6 +255,15 @@ namespace Adv.Server.Game
             packet.Write32(timeLeft);
 
             return packet.ToArray();
+        }
+
+        public static ClientUsePacket ProcessClientUsePacket(ref Span<byte> packet)
+        {
+            var clientUsePacket = new ClientUsePacket(packet.ToArray().ToList());
+
+            clientUsePacket.ItemId = PacketProcessor.Read32(ref packet);
+
+            return clientUsePacket;
         }
     }
 }
