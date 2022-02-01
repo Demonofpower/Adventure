@@ -27,6 +27,6 @@ Currently you can go ingame and explore the world.
 - Jump :heavy_check_mark:
 - Chat :heavy_check_mark:
 - Enable PvP :heavy_check_mark:
-- Pickup items :white_check_mark:
 - See others :heavy_check_mark:
+- Pickup items :white_check_mark:
 - Everything else :) :x:
