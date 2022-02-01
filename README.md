@@ -1,5 +1,6 @@
 # Adventure
-This is a custom server implementation of the play-to-hack game [Pwn Adventure 3: Pwnie Island](https://www.pwnadventure.com/)
+This is a custom server implementation of the play-to-hack game [Pwn Adventure 3: Pwnie Island](https://www.pwnadventure.com/)  
+The server is inside folder Adv.Server, everything other is protocol analysis related.
 
 # Progress
 The implementation of the protocol and backend is quite advanced.  
