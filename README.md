@@ -21,3 +21,12 @@ Currently you can go ingame and explore the world.
 
 ## GameServer
 ![Progress](https://progress-bar.dev/35/?title=GameServer)
+- Handshake :heavy_check_mark:
+- Join game :heavy_check_mark:
+- Move :heavy_check_mark:
+- Jump :heavy_check_mark:
+- Chat :heavy_check_mark:
+- Enable PvP :heavy_check_mark:
+- Pickup items :white_check_mark:
+- See others :heavy_check_mark:
+- Everything else :) :x:
