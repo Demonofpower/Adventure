@@ -265,5 +265,30 @@ namespace Adv.Server.Game
 
             return clientUsePacket;
         }
+
+        public static byte[] CreateServerAddItemPacket(ItemType itemType, int slot)
+        {
+            var packet = new List<byte>();
+
+            packet.Write8(0x63);
+            packet.Write8(0x70);
+
+            packet.WriteString(itemType.ToString());
+            packet.Write32(slot);
+
+            return packet.ToArray();
+        }
+
+        public static byte[] CreateServerPickedUpPacket(PickupType pickupType)
+        {
+            var packet = new List<byte>();
+
+            packet.Write8(0x70);
+            packet.Write8(0x75);
+
+            packet.WriteString(pickupType.ToString());
+
+            return packet.ToArray();
+        }
     }
 }

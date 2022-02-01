@@ -8,7 +8,7 @@
         OnActorSpawnEvent = 0x6d6b,
         OnReloadEvent = 0x726c,
         OnRespawnOtherPlayerEvent = 0x726f,
-        OnAddItemEvent = 0x8370,
+        OnAddItemEvent = 0x6370,
         OnRemoteReloadEvent = 0x7372,
         OnTeleportEvent = 0xfff3, //TODO
         OnStartQuestEvent = 0x6e71,

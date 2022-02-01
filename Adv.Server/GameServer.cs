@@ -17,6 +17,8 @@ namespace Adv.Server
     class GameServer
     {
         public static List<Actor> Actors;
+
+        private UseHandler useHandler;
         
         private Dictionary<TcpClient, Tuple<string, Character>> sessions;
 
@@ -265,7 +267,9 @@ namespace Adv.Server
 
                     Console.WriteLine($"UsePacket - itemId: {usePacket.ItemId} + character: {currentCharacter.Name}");
 
-                    return (null, false);
+                    var returnPacket = useHandler.Process(usePacket.ItemId, currentCharacter);
+                    
+                    return (returnPacket, false);
                 case GamePacketType.TransitionToNPCState:
                     break;
                 case GamePacketType.BuyItem:
@@ -319,8 +323,9 @@ namespace Adv.Server
             sessions = new Dictionary<TcpClient, Tuple<string, Character>>();
 
             Actors = new List<Actor>();
-            
             Actors.Add(new Actor(100, ActorType.GreatBallsOfFire, new Vector3(-43653.71f, - 55836.54f, 405.65f), new Rotation(-16384, 0, -16451)));
+
+            useHandler = new UseHandler(Actors);
         }
     }
 }
