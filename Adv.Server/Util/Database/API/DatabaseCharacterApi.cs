@@ -33,7 +33,7 @@ namespace Adv.Server.Util.Database.API
 
                     var user = allUsers.First(u => u.Id == dbUser);
 
-                    list.Add(new Character(name, Location.TODO, avatar, colorA, colorB, colorC, colorD, flags,
+                    list.Add(new Character(name, Location.LostCave, avatar, colorA, colorB, colorC, colorD, flags,
                         isAdmin, user, id));
                 }
             }

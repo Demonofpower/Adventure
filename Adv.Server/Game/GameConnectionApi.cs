@@ -290,5 +290,15 @@ namespace Adv.Server.Game
 
             return packet.ToArray();
         }
+
+        public static ClientActivatePacket ProcessClientActivatePacket(ref Span<byte> packet)
+        {
+            var clientActivatePacket = new ClientActivatePacket(packet.ToArray().ToList());
+
+            clientActivatePacket.Name = PacketProcessor.ReadString(ref packet);
+            clientActivatePacket.Position = PacketProcessor.ReadVector3(ref packet);
+
+            return clientActivatePacket;
+        }
     }
 }

@@ -165,7 +165,7 @@ namespace Adv.Server
                         loggedInUser.Count(u => u.Value != null && u.Value.Team.Id == currentUser.Team.Id) - 1,
                         loggedInUser.Count(u => u.Value != null));
                 case MasterPacketType.GetTeammates:
-                    break;
+                    return MasterConnectionApi.CreateServerTeammatesListPacket(currentUser, GameServer.sessions.Select(s => s.Value.Item2).ToList());
                 case MasterPacketType.CharacterList:
                     return MasterConnectionApi.CreateServerCharacterListPacket(currentUser);
                 case MasterPacketType.CreateCharacter:
@@ -174,7 +174,7 @@ namespace Adv.Server
                         $"CreateCharacter - Name: {clientCreateCharacterPacket.Name} User: {currentUser.Username}");
 
 
-                    var character = new Character(clientCreateCharacterPacket.Name, Location.TODO,
+                    var character = new Character(clientCreateCharacterPacket.Name, Location.LostCave,
                         clientCreateCharacterPacket.Avatar, clientCreateCharacterPacket.ColorA,
                         clientCreateCharacterPacket.ColorB, clientCreateCharacterPacket.ColorC,
                         clientCreateCharacterPacket.ColorD, 0, false, currentUser);

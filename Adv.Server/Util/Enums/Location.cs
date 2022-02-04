@@ -2,6 +2,6 @@
 {
     public enum Location
     {
-        TODO
+        LostCave
     }
 }

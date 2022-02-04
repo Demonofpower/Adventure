@@ -20,7 +20,7 @@ namespace Adv.Server
 
         private UseHandler useHandler;
         
-        private Dictionary<TcpClient, Tuple<string, Character>> sessions;
+        public static Dictionary<TcpClient, Tuple<string, Character>> sessions;
 
         public void Start(int port)
         {
@@ -275,7 +275,12 @@ namespace Adv.Server
                 case GamePacketType.BuyItem:
                     break;
                 case GamePacketType.Activate:
-                    break;
+                    var activatePacket = GameConnectionApi.ProcessClientActivatePacket(ref packet);
+
+                    Console.WriteLine($"ActivatePacket - name: {activatePacket.Name} + pos: {activatePacket.Position.X} {activatePacket.Position.Y} {activatePacket.Position.Z}");
+                    
+                    //TODO
+                    return (null, false);
                 case GamePacketType.FireRequest:
                     break;
                 case GamePacketType.SellItem:

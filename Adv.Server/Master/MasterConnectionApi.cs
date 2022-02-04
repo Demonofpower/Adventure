@@ -249,5 +249,23 @@ namespace Adv.Server.Master
 
             return buffer.ToArray();
         }
+
+        public static byte[] CreateServerTeammatesListPacket(User currUser, List<Character> onlineChars)
+        {
+            var buffer = new List<byte>();
+
+            var team = currUser.Team;
+
+            var onlineTeammates = onlineChars.Where(u => u.User.Team == team);
+            
+            buffer.Write16((short) onlineTeammates.Count());
+            foreach (var onlineTeammate in onlineTeammates)
+            {
+                buffer.WriteString(onlineTeammate.Name);
+                buffer.WriteString(onlineTeammate.Location.ToString());
+            }
+
+            return buffer.ToArray();
+        }
     }
 }
