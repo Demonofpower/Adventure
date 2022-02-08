@@ -22,7 +22,9 @@
         GoldenEgg8,
         GoldenEgg9,
         BallmerPeakEgg,
-        BallmerPeakPoster
+        BallmerPeakPoster,
+        
+        Fireball
         //MAYBE MORE
     }
 }

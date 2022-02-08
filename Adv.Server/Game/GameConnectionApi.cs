@@ -300,5 +300,17 @@ namespace Adv.Server.Game
 
             return clientActivatePacket;
         }
+
+        public static byte[] CreateServerManaUpdatePacket(int mana)
+        {
+            var packet = new List<byte>();
+
+            packet.Write8(0x61);
+            packet.Write8(0x6d);
+
+            packet.Write32(mana);
+
+            return packet.ToArray();
+        }
     }
 }

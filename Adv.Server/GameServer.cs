@@ -176,13 +176,13 @@ namespace Adv.Server
                 case GamePacketType.OnPvpEnableEvent:
                     var pvpEnablePacket = GameConnectionApi.ProcessClientPvPEnablePacket(ref packet);
 
-                    int timeLeft = 5;
-                    Timer timer = null;
-                    timer = new Timer(callback =>
+                    int pvpEnableTimeLeft = 5;
+                    Timer pvpEnableTimer = null;
+                    pvpEnableTimer = new Timer(callback =>
                     {
-                        client.GetStream().Write(GameConnectionApi.CreateServerPvpCountdownUpdatePacket(pvpEnablePacket.State, timeLeft));
-                        timeLeft -= 1;
-                        if (timeLeft < 0)
+                        client.GetStream().Write(GameConnectionApi.CreateServerPvpCountdownUpdatePacket(pvpEnablePacket.State, pvpEnableTimeLeft));
+                        pvpEnableTimeLeft -= 1;
+                        if (pvpEnableTimeLeft < 0)
                         {
                             client.GetStream().Write(GameConnectionApi.CreateServerPvpEnablePacket(pvpEnablePacket.State));
                             
@@ -190,7 +190,7 @@ namespace Adv.Server
 
                             currentCharacter.PvPEnabled = pvpEnablePacket.State != 0;
                             
-                            timer.Change(Timeout.Infinite, Timeout.Infinite);
+                            pvpEnableTimer.Change(Timeout.Infinite, Timeout.Infinite);
                         }
                     }, null, 0, 1000);
 
@@ -278,9 +278,28 @@ namespace Adv.Server
                     var activatePacket = GameConnectionApi.ProcessClientActivatePacket(ref packet);
 
                     Console.WriteLine($"ActivatePacket - name: {activatePacket.Name} + pos: {activatePacket.Position.X} {activatePacket.Position.Y} {activatePacket.Position.Z}");
-                    
+
+                    var fireballSpawnPacket = GameConnectionApi.CreateActorSpawnPacket(3421, ActorType.Fireball,
+                        currentCharacter.Position.AddToCoords(x:200), currentCharacter.Rotation);
+
+                    int timeLeft = 1;
+                    Timer timer = null;
+                    timer = new Timer(callback =>
+                    {
+                        var fireballUpdatePacket =
+                            GameConnectionApi.CreateServerPositionPacket(3421, currentCharacter.Position.AddToCoords(x: 20*timeLeft), currentCharacter.Rotation);
+                        
+                        client.GetStream().Write(fireballUpdatePacket);
+                        
+                        timeLeft += 1;
+                        if (timeLeft > 30)
+                        {
+                            timer.Change(Timeout.Infinite, Timeout.Infinite);
+                        }
+                    }, null, 1000, 100);
+
                     //TODO
-                    return (null, false);
+                    return (fireballSpawnPacket, false);
                 case GamePacketType.FireRequest:
                     break;
                 case GamePacketType.SellItem:
