@@ -65,7 +65,7 @@ namespace Adv.Server.Game
             return packet.ToArray();
         }
 
-        public static byte[] CreateActorSpawnPacket(int actorId, ActorType actor, Vector3 position, Rotation rotation)
+        public static byte[] CreateActorSpawnPacket(int actorId, ActorType actor, Vector3 position, Rotation rotation, int unknown = 0)
         {
             var packet = new List<byte>();
 
@@ -74,7 +74,7 @@ namespace Adv.Server.Game
             packet.Write8(0x6b);
 
             packet.Write32(actorId);
-            packet.Write32(0x0);
+            packet.Write32(unknown);
             packet.Write8(0x0);
             packet.WriteString(actor.ToString());
             packet.WriteVector3(position);
