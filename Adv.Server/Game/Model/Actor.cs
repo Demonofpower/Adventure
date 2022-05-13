@@ -2,7 +2,7 @@
 using Adv.Server.Util;
 using Adv.Server.Util.Enums;
 
-namespace Adv.Server.Game
+namespace Adv.Server.Game.Model
 {
     class Actor
     {

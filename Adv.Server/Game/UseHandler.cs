@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Adv.Server.Game.Model;
 using Adv.Server.Master;
 using Adv.Server.Util.Enums;
 

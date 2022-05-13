@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Numerics;
 using System.Threading;
 using Adv.Server.Game;
+using Adv.Server.Game.Model;
 using Adv.Server.Master;
 using Adv.Server.Packets;
 using Adv.Server.Packets.Game;
