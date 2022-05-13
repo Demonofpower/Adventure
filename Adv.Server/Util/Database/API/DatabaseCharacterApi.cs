@@ -9,7 +9,7 @@ namespace Adv.Server.Util.Database.API
 {
     class DatabaseCharacterApi
     {
-        public static List<Character> GetAllCharacters(DatabaseConnection connection, List<User> allUsers)
+        public static List<Character> GetAllCharacters(IDatabaseConnection connection, List<User> allUsers)
         {
             var result = connection.ExecuteQuery(@"SELECT * from adventure.characters");
 
@@ -47,7 +47,7 @@ namespace Adv.Server.Util.Database.API
             return list.Any() ? list : null;
         }
 
-        public static bool AddCharacter(Character character, DatabaseConnection connection)
+        public static bool AddCharacter(Character character, IDatabaseConnection connection)
         {
             var cmdText =
                 @"INSERT INTO adventure.characters(name,location,avatar,colorA,colorB,colorC,colorD,flags,isAdmin,user)

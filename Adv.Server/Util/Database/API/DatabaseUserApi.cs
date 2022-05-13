@@ -7,7 +7,7 @@ namespace Adv.Server.Util.Database.API
 {
     class DatabaseUserApi
     {
-        public static List<User> GetAllUsers(DatabaseConnection connection, List<Team> allTeams)
+        public static List<User> GetAllUsers(IDatabaseConnection connection, List<Team> allTeams)
         {
             var result = connection.ExecuteQuery(@"SELECT * from adventure.users");
 
@@ -39,7 +39,7 @@ namespace Adv.Server.Util.Database.API
         }
 
 
-        //public static User GetUserByName(string name, DatabaseConnection connection)
+        //public static User GetUserByName(string name, IDatabaseConnection connection)
         //{
         //    var result = connection.ExecuteQuery(@"SELECT * from adventure.users WHERE username = @username",
         //        new Tuple<string, object>("@username", name));
@@ -67,7 +67,7 @@ namespace Adv.Server.Util.Database.API
         //    return null;
         //}
 
-        //public static User GetUserById(int id, DatabaseConnection connection)
+        //public static User GetUserById(int id, IDatabaseConnection connection)
         //{
         //    var result = connection.ExecuteQuery(@"SELECT * from adventure.users WHERE id = @id",
         //        new Tuple<string, object>("@id", id));
@@ -95,7 +95,7 @@ namespace Adv.Server.Util.Database.API
         //    return null;
         //}
 
-        public static bool AddUser(User user, List<Team> teams, DatabaseConnection connection)
+        public static bool AddUser(User user, List<Team> teams, IDatabaseConnection connection)
         {
             if (user.Characters.Any())
             {

@@ -7,7 +7,7 @@ namespace Adv.Server.Util.Database.API
 {
     class DatabaseTeamApi
     {
-        public static List<Team> GetAllTeams(DatabaseConnection connection)
+        public static List<Team> GetAllTeams(IDatabaseConnection connection)
         {
             var result = connection.ExecuteQuery(@"SELECT * from adventure.teams");
 
@@ -33,7 +33,7 @@ namespace Adv.Server.Util.Database.API
             return list.Any() ? list : null;
         }
 
-        //public static Team GetTeamByName(string teamName, DatabaseConnection connection)
+        //public static Team GetTeamByName(string teamName, IDatabaseConnection connection)
         //{
         //    var result = connection.ExecuteQuery(@"SELECT * from adventure.teams WHERE name = @name",
         //        new Tuple<string, object>("@name", teamName));
@@ -59,7 +59,7 @@ namespace Adv.Server.Util.Database.API
         //    return null;
         //}
 
-        //public static Team GetTeamBySecretName(string secretTeamName, DatabaseConnection connection)
+        //public static Team GetTeamBySecretName(string secretTeamName, IDatabaseConnection connection)
         //{
         //    var result = connection.ExecuteQuery(@"SELECT * from adventure.teams WHERE secretName = @secretTeamName",
         //        new Tuple<string, object>("@secretTeamName", secretTeamName));
@@ -85,7 +85,7 @@ namespace Adv.Server.Util.Database.API
         //    return null;
         //}
 
-        //public static Team GetTeamById(int id, DatabaseConnection connection)
+        //public static Team GetTeamById(int id, IDatabaseConnection connection)
         //{
         //    var result = connection.ExecuteQuery(@"SELECT * from adventure.teams WHERE id = @id",
         //        new Tuple<string, object>("@id", id));
@@ -110,7 +110,7 @@ namespace Adv.Server.Util.Database.API
         //    return null;
         //}
 
-        public static bool AddTeam(Team team, DatabaseConnection connection)
+        public static bool AddTeam(Team team, IDatabaseConnection connection)
         {
             var cmdText =
                 @"INSERT INTO adventure.teams(name,secretName) VALUES(@name, @secretName)";

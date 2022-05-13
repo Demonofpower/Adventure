@@ -27,11 +27,11 @@ namespace Adv.Server
 
         private Dictionary<TcpClient, User> loggedInUser;
 
-        private DatabaseConnection dbConnection = null;
+        private IDatabaseConnection dbConnection = null;
 
         private static X509Certificate serverCertificate;
 
-        public void Start(int port, string certificate, DatabaseConnection dbConnection)
+        public void Start(int port, string certificate, IDatabaseConnection dbConnection)
         {
             this.dbConnection = dbConnection;
 

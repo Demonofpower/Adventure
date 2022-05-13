@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Data.SqlClient;
 using MySql.Data.MySqlClient;
 
 namespace Adv.Server.Util.Database
 {
-    class DatabaseConnection : IDisposable
+    class DatabaseConnection : IDatabaseConnection
     {
         private string connectionString;
 
