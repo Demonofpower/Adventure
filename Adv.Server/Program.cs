@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
-using Adv.Server.Master;
 using Adv.Server.Util.Database;
 using Adv.Server.Util.Database.API;
+using Adv.Server.Util.Database.API.Fake;
+using Adv.Server.Util.Database.API.Impl;
 
 namespace Adv.Server
 {
@@ -14,7 +14,9 @@ namespace Adv.Server
         
         public static int Main(string[] args)
         {
+            //DatabaseApi.Init(new DatabaseCharacterApi(), new DatabaseTeamApi(), new DatabaseUserApi());
             //var db = new DatabaseConnection("Server=localhost;Port=3306;Uid=Juli;Pwd=pwnadventure3;");
+            DatabaseApi.Init(new FakeDatabaseCharacterApi(), new FakeDatabaseTeamApi(), new FakeDatabaseUserApi());
             var db = new FakeDatabaseConnection();
             
             masterServer = new MasterServer();
@@ -33,7 +35,7 @@ namespace Adv.Server
 
         private static void StartMasterServer(IDatabaseConnection dbConnection)
         {
-            masterServer.Start(3333, @"C:\Users\Juli\Desktop\ssl\192.168.178.32.pfx", dbConnection);
+            masterServer.Start(3333, @"C:\Users\Juli\Desktop\PwnAdventure3\j.crt", dbConnection);
         }
 
         private static void StartGameServer()

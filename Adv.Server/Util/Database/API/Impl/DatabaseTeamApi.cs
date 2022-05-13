@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Adv.Server.Master;
 
-namespace Adv.Server.Util.Database.API
+namespace Adv.Server.Util.Database.API.Impl
 {
-    class DatabaseTeamApi
+    class DatabaseTeamApi : IDatabaseTeamApi
     {
-        public static List<Team> GetAllTeams(IDatabaseConnection connection)
+        public List<Team> GetAllTeams(IDatabaseConnection connection)
         {
             var result = connection.ExecuteQuery(@"SELECT * from adventure.teams");
 
@@ -110,7 +110,7 @@ namespace Adv.Server.Util.Database.API
         //    return null;
         //}
 
-        public static bool AddTeam(Team team, IDatabaseConnection connection)
+        public bool AddTeam(Team team, IDatabaseConnection connection)
         {
             var cmdText =
                 @"INSERT INTO adventure.teams(name,secretName) VALUES(@name, @secretName)";

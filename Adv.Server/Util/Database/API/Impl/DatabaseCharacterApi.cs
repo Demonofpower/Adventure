@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Adv.Server.Master;
 using Adv.Server.Util.Enums;
 
-namespace Adv.Server.Util.Database.API
+namespace Adv.Server.Util.Database.API.Impl
 {
-    class DatabaseCharacterApi
+    class DatabaseCharacterApi : IDatabaseCharacterApi
     {
-        public static List<Character> GetAllCharacters(IDatabaseConnection connection, List<User> allUsers)
+        public List<Character> GetAllCharacters(IDatabaseConnection connection, List<User> allUsers)
         {
             var result = connection.ExecuteQuery(@"SELECT * from adventure.characters");
 
@@ -47,7 +46,7 @@ namespace Adv.Server.Util.Database.API
             return list.Any() ? list : null;
         }
 
-        public static bool AddCharacter(Character character, IDatabaseConnection connection)
+        public bool AddCharacter(Character character, IDatabaseConnection connection)
         {
             var cmdText =
                 @"INSERT INTO adventure.characters(name,location,avatar,colorA,colorB,colorC,colorD,flags,isAdmin,user)

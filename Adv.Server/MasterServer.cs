@@ -12,6 +12,7 @@ using Adv.Server.Packets;
 using Adv.Server.Packets.Master;
 using Adv.Server.Util.Database;
 using Adv.Server.Util.Database.API;
+using Adv.Server.Util.Database.API.Impl;
 using Adv.Server.Util.Enums;
 
 namespace Adv.Server
@@ -146,7 +147,7 @@ namespace Adv.Server
                     var team = new Team(clientRegisterPacket.TeamNameOrHash, clientRegisterPacket.TeamNameOrHash);
                     var newUser = new User(clientRegisterPacket.Username, clientRegisterPacket.Password, team, false,
                         new List<Character>());
-                    var addUserResult = DatabaseUserApi.AddUser(newUser, Teams, dbConnection);
+                    var addUserResult = DatabaseApi.AddUser(newUser, Teams, dbConnection);
 
                     Reload();
 
@@ -179,7 +180,7 @@ namespace Adv.Server
                         clientCreateCharacterPacket.ColorB, clientCreateCharacterPacket.ColorC,
                         clientCreateCharacterPacket.ColorD, 0, false, currentUser);
 
-                    var createCharacterResult = DatabaseCharacterApi.AddCharacter(character, dbConnection);
+                    var createCharacterResult = DatabaseApi.AddCharacter(character, dbConnection);
 
                     Reload();
 
@@ -246,21 +247,21 @@ namespace Adv.Server
             Achievements = new List<Achievement>();
 
             Teams = new List<Team>();
-            var dbTeams = DatabaseTeamApi.GetAllTeams(dbConnection);
+            var dbTeams = DatabaseApi.GetAllTeams(dbConnection);
             if (dbTeams != null)
             {
                 Teams.AddRange(dbTeams);
             }
 
             Users = new List<User>();
-            var dbUsers = DatabaseUserApi.GetAllUsers(dbConnection, Teams);
+            var dbUsers = DatabaseApi.GetAllUsers(dbConnection, Teams);
             if (dbUsers != null)
             {
                 Users.AddRange(dbUsers);
             }
 
             Characters = new List<Character>();
-            var dbCharacters = DatabaseCharacterApi.GetAllCharacters(dbConnection, Users);
+            var dbCharacters = DatabaseApi.GetAllCharacters(dbConnection, Users);
             if (dbCharacters != null)
             {
                 Characters.AddRange(dbCharacters);
@@ -275,21 +276,21 @@ namespace Adv.Server
         private void Reload()
         {
             Teams.Clear();
-            var dbTeams = DatabaseTeamApi.GetAllTeams(dbConnection);
+            var dbTeams = DatabaseApi.GetAllTeams(dbConnection);
             if (dbTeams != null)
             {
                 Teams.AddRange(dbTeams);
             }
 
             Users.Clear();
-            var dbUsers = DatabaseUserApi.GetAllUsers(dbConnection, Teams);
+            var dbUsers = DatabaseApi.GetAllUsers(dbConnection, Teams);
             if (dbUsers != null)
             {
                 Users.AddRange(dbUsers);
             }
 
             Characters.Clear();
-            var dbCharacters = DatabaseCharacterApi.GetAllCharacters(dbConnection, Users);
+            var dbCharacters = DatabaseApi.GetAllCharacters(dbConnection, Users);
             if (dbCharacters != null)
             {
                 Characters.AddRange(dbCharacters);

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Adv.Server.Master;
 
-namespace Adv.Server.Util.Database.API
+namespace Adv.Server.Util.Database.API.Impl
 {
-    class DatabaseUserApi
+    class DatabaseUserApi : IDatabaseUserApi
     {
-        public static List<User> GetAllUsers(IDatabaseConnection connection, List<Team> allTeams)
+        public List<User> GetAllUsers(IDatabaseConnection connection, List<Team> allTeams)
         {
             var result = connection.ExecuteQuery(@"SELECT * from adventure.users");
 
@@ -95,7 +95,7 @@ namespace Adv.Server.Util.Database.API
         //    return null;
         //}
 
-        public static bool AddUser(User user, List<Team> teams, IDatabaseConnection connection)
+        public bool AddUser(User user, List<Team> teams, IDatabaseConnection connection)
         {
             if (user.Characters.Any())
             {
@@ -116,8 +116,8 @@ namespace Adv.Server.Util.Database.API
                 team = teams.FirstOrDefault(t => t.TeamName == user.Team.TeamName);
                 if (team == null)
                 {
-                    DatabaseTeamApi.AddTeam(new Team(user.Team.TeamName, user.Team.SecretTeamName), connection);
-                    team = DatabaseTeamApi.GetAllTeams(connection).First(t => t.TeamName == user.Team.TeamName);
+                    DatabaseApi.AddTeam(new Team(user.Team.TeamName, user.Team.SecretTeamName), connection);
+                    team = DatabaseApi.GetAllTeams(connection).First(t => t.TeamName == user.Team.TeamName);
                 }
                 else
                 {
