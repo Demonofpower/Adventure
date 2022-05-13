@@ -19,17 +19,17 @@ namespace Adv.Server.Util.Database.API
             {
                 while (result.Read())
                 {
-                    var id = result.GetInt32("id");
-                    var name = result.GetString("name");
-                    var location = result.GetInt32("location");
-                    var avatar = result.GetByte("avatar");
-                    var colorA = result.GetInt32("colorA");
-                    var colorB = result.GetInt32("colorB");
-                    var colorC = result.GetInt32("colorC");
-                    var colorD = result.GetInt32("colorD");
-                    var flags = result.GetInt32("flags");
-                    var isAdmin = result.GetBoolean("isAdmin");
-                    var dbUser = result.GetInt32("user");
+                    var id = result.GetInt32(result.GetOrdinal("id"));
+                    var name = result.GetString(result.GetOrdinal("name"));
+                    var location = result.GetInt32(result.GetOrdinal("location"));
+                    var avatar = result.GetByte(result.GetOrdinal("avatar"));
+                    var colorA = result.GetInt32(result.GetOrdinal("colorA"));
+                    var colorB = result.GetInt32(result.GetOrdinal("colorB"));
+                    var colorC = result.GetInt32(result.GetOrdinal("colorC"));
+                    var colorD = result.GetInt32(result.GetOrdinal("colorD"));
+                    var flags = result.GetInt32(result.GetOrdinal("flags"));
+                    var isAdmin = result.GetBoolean(result.GetOrdinal("isAdmin"));
+                    var dbUser = result.GetInt32(result.GetOrdinal("user"));
 
                     var user = allUsers.First(u => u.Id == dbUser);
 

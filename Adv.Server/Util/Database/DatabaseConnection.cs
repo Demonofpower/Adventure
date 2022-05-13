@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using MySql.Data.MySqlClient;
 
 namespace Adv.Server.Util.Database
@@ -64,7 +65,7 @@ namespace Adv.Server.Util.Database
             command.ExecuteNonQuery();
         }
 
-        public MySqlDataReader ExecuteQuery(string commandText, params Tuple<string, object>[] parameters)
+        public IDataReader ExecuteQuery(string commandText, params Tuple<string, object>[] parameters)
         {
             var command = new MySqlCommand(commandText, connection);
             foreach (var parameter in parameters)

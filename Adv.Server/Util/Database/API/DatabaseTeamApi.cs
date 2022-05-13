@@ -17,9 +17,9 @@ namespace Adv.Server.Util.Database.API
             {
                 while (result.Read())
                 {
-                    var id = result.GetInt32("id");
-                    var name = result.GetString("name");
-                    var secretName = result.GetString("secretName");
+                    var id = result.GetInt32(result.GetOrdinal("id"));
+                    var name = result.GetString(result.GetOrdinal("name"));
+                    var secretName = result.GetString(result.GetOrdinal("secretName"));
                     
                     list.Add(new Team(name, secretName, id));
                 }

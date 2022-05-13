@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using MySql.Data.MySqlClient;
 
 namespace Adv.Server.Util.Database
@@ -7,22 +8,24 @@ namespace Adv.Server.Util.Database
     {
         public void Dispose()
         {
-            throw new NotImplementedException();
+            //Nothing to do
         }
 
         public void Init()
         {
-            throw new NotImplementedException();
+            //Nothing to do
         }
 
         public void ExecuteNonQuery(string commandText, params Tuple<string, object>[] parameters)
         {
-            throw new NotImplementedException();
+            //Nothing to do
         }
 
-        public MySqlDataReader ExecuteQuery(string commandText, params Tuple<string, object>[] parameters)
+        public IDataReader ExecuteQuery(string commandText, params Tuple<string, object>[] parameters)
         {
-            throw new NotImplementedException();
+            var fakeDataReader = new FakeDataReader();
+
+            return fakeDataReader;
         }
     }
 }

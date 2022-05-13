@@ -17,11 +17,11 @@ namespace Adv.Server.Util.Database.API
             {
                 while (result.Read())
                 {
-                    var id = result.GetInt32("id");
-                    var username = result.GetString("username");
-                    var password = result.GetString("password");
-                    var isAdmin = result.GetBoolean("isAdmin");
-                    var userTeam = result.GetInt32("team");
+                    var id = result.GetInt32(result.GetOrdinal("id"));
+                    var username = result.GetString(result.GetOrdinal("username"));
+                    var password = result.GetString(result.GetOrdinal("password"));
+                    var isAdmin = result.GetBoolean(result.GetOrdinal("isAdmin"));
+                    var userTeam = result.GetInt32(result.GetOrdinal("team"));
 
                     var team = allTeams.First(t => t.Id == userTeam);
 
