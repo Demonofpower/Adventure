@@ -35,7 +35,7 @@ namespace Adv.Server
 
         private static void StartMasterServer(IDatabaseConnection dbConnection)
         {
-            masterServer.Start(3333, @"C:\Users\Juli\Desktop\PwnAdventure3\j.crt", dbConnection);
+            masterServer.Start(3333, @"C:\Users\Juli\Desktop\PwnAdventure3\j.pfx", dbConnection);
         }
 
         private static void StartGameServer()

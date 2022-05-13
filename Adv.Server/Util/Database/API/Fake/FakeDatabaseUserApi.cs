@@ -8,6 +8,11 @@ namespace Adv.Server.Util.Database.API.Fake
     {
         private List<User> users;
 
+        public FakeDatabaseUserApi()
+        {
+            users = new List<User>();
+        }
+
         public List<User> GetAllUsers(IDatabaseConnection connection, List<Team> allTeams)
         {
             return users;
