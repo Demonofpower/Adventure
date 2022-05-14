@@ -21,6 +21,7 @@ namespace Adv.Server.Util.Database.API.Fake
 
         public bool AddTeam(Team team, IDatabaseConnection connection)
         {
+            team.Id = Constants.Random.Next(0, 10000);
             teams.Add(team);
 
             return true;

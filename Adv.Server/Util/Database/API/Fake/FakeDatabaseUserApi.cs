@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata;
 using Adv.Server.Master;
 
 namespace Adv.Server.Util.Database.API.Fake
@@ -20,6 +21,7 @@ namespace Adv.Server.Util.Database.API.Fake
 
         public bool AddUser(User user, List<Team> teams, IDatabaseConnection connection)
         {
+            user.Id = Constants.Random.Next(0, 10000);
             users.Add(user);
 
             return true;

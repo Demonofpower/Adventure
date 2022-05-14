@@ -19,6 +19,7 @@ namespace Adv.Server.Util.Database.API.Fake
 
         public bool AddCharacter(Character character, IDatabaseConnection connection)
         {
+            character.Id = Constants.Random.Next(0, 10000);
             characters.Add(character);
 
             return true;
