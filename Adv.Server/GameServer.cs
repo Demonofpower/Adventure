@@ -23,6 +23,8 @@ namespace Adv.Server
         
         public static Dictionary<TcpClient, Tuple<string, Character>> sessions;
 
+        private static bool pvpToggleTimerRunning;
+
         public void Start(int port)
         {
             Populate();
@@ -177,8 +179,14 @@ namespace Adv.Server
                 case GamePacketType.OnPvpEnableEvent:
                     var pvpEnablePacket = GameConnectionApi.ProcessClientPvPEnablePacket(ref packet);
 
+                    if (pvpToggleTimerRunning)
+                    {
+                        return (null, false);
+                    }
+
                     int pvpEnableTimeLeft = 5;
                     Timer pvpEnableTimer = null;
+                    pvpToggleTimerRunning = true;
                     pvpEnableTimer = new Timer(callback =>
                     {
                         client.GetStream().Write(GameConnectionApi.CreateServerPvpCountdownUpdatePacket(pvpEnablePacket.State, pvpEnableTimeLeft));
@@ -192,6 +200,10 @@ namespace Adv.Server
                             currentCharacter.PvPEnabled = pvpEnablePacket.State != 0;
                             
                             pvpEnableTimer.Change(Timeout.Infinite, Timeout.Infinite);
+
+                            pvpToggleTimerRunning = false;
+
+                            Console.WriteLine($"PvpEnablePacket - pvp state: User \"{currentCharacter.User.Username}\" set pvp to {(currentCharacter.PvPEnabled ? "enabled" : "disabled")}");
                         }
                     }, null, 0, 1000);
 
