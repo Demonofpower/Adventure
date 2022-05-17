@@ -6,12 +6,23 @@ The server is inside folder Adv.Server, everything other is protocol analysis re
 The implementation of the protocol and backend is quite advanced.  
 Currently you can go ingame and explore the world.
 
-#Setup
-Insert
-<Server host IP> master.pwn3
-<Server host IP> game.pwn3
-Into C:\Windows\System32\drivers\etc\hosts
+# Setup
+1. Insert<br />
+[Server host IP] master.pwn3<br />
+[Server host IP] game.pwn3<br />
+Into C:\Windows\System32\drivers\etc\hosts<br />
   
+2. Replace content of server.ini (located at PwnAdventure3\Content\Server\server.ini (related to the PwnAdventure3.exe) with<br />
+[MasterServer]<br />
+Hostname=master.pwn3<br />
+Port=3333<br />
+[GameServer]<br />
+Hostname=game.pwn3<br />
+Port=3000<br />
+Username=<br />
+Password=<br />
+<br />
+
 ## MasterServer
 ![Progress](https://progress-bar.dev/80/?title=MasterServer)  
 - Handshake :heavy_check_mark:
