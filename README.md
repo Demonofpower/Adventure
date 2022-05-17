@@ -6,6 +6,12 @@ The server is inside folder Adv.Server, everything other is protocol analysis re
 The implementation of the protocol and backend is quite advanced.  
 Currently you can go ingame and explore the world.
 
+#Setup
+Insert
+<Server host IP> master.pwn3
+<Server host IP> game.pwn3
+Into C:\Windows\System32\drivers\etc\hosts
+  
 ## MasterServer
 ![Progress](https://progress-bar.dev/80/?title=MasterServer)  
 - Handshake :heavy_check_mark:
