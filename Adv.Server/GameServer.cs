@@ -23,7 +23,7 @@ namespace Adv.Server
         
         public static Dictionary<TcpClient, Tuple<string, Character>> sessions;
 
-        private static bool pvpToggleTimerRunning;
+        private bool pvpToggleTimerRunning;
 
         public void Start(int port)
         {
