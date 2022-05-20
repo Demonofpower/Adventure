@@ -7,6 +7,7 @@ using System.Numerics;
 using System.Threading;
 using Adv.Server.Game;
 using Adv.Server.Game.Model;
+using Adv.Server.Game.Processing;
 using Adv.Server.Master;
 using Adv.Server.Packets;
 using Adv.Server.Packets.Game;
@@ -17,11 +18,11 @@ namespace Adv.Server
 {
     class GameServer
     {
+        public static Dictionary<TcpClient, Tuple<string, Character>> sessions;
         public static List<Actor> Actors;
 
+        private Controller controller;
         private UseHandler useHandler;
-        
-        public static Dictionary<TcpClient, Tuple<string, Character>> sessions;
 
         public void Start(int port)
         {
@@ -352,6 +353,9 @@ namespace Adv.Server
             Actors.Add(new Actor(100, ActorType.GreatBallsOfFire, new Vector3(-43653.71f, - 55836.54f, 405.65f), new Rotation(-16384, 0, -16451)));
 
             useHandler = new UseHandler(Actors);
+
+            controller = new Controller(new PacketManager());
+            controller.Start();
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Adv.Server.Game
 {
     class UseHandler
     {
-        private List<Actor> actors;
+        private readonly List<Actor> actors;
         
         private int greatBallsOfFireActor;
 
@@ -22,7 +22,6 @@ namespace Adv.Server.Game
         {
             greatBallsOfFireActor = actors.First(a => a.ActorType == ActorType.GreatBallsOfFire).Id;
         }
-        
         
         public byte[] Process(int itemId, Character character)
         {

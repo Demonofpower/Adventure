@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using Adv.Server.Game.Model.GameObjects;
 
 namespace Adv.Server.Game.Processing
 {
@@ -11,13 +13,28 @@ namespace Adv.Server.Game.Processing
         private readonly PacketManager packetManager;
         private ulong currTick;
 
+        private List<GameObject> gameObjects;
+
         public Controller(PacketManager packetManager)
         {
             this.packetManager = packetManager;
             currTick = 0;
+
+            gameObjects = new List<GameObject>();
         }
 
-        public void Loop()
+        public void Start()
+        {
+            new Thread(() =>
+            {
+                while (true)
+                {
+                    Loop();
+                }
+            }).Start();
+        }
+
+        private void Loop()
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -25,6 +42,10 @@ namespace Adv.Server.Game.Processing
             //TODO
             currTick += 1;
             Console.WriteLine($"Tick {currTick}");
+            foreach (var gameObject in gameObjects)
+            {
+                gameObject.Tick();
+            }
             packetManager.Flush();
 
             stopwatch.Stop();
@@ -37,6 +58,13 @@ namespace Adv.Server.Game.Processing
             {
                 Console.WriteLine($"TICK TOOK TOO LONG {currTick}");
             }
+
+            CreateFireball();
+        }
+
+        public void CreateFireball()
+        {
+            gameObjects.Add(new Fireball());
         }
     }
 }
