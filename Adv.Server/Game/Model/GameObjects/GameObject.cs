@@ -6,16 +6,18 @@ namespace Adv.Server.Game.Model.GameObjects
 {
     abstract class GameObject
     {
-        private ulong ticksAlive;
-
-        private int actorId;
-        private ActorType actorType;
-        private Vector3 position;
-        private Rotation rotation;
+        public ulong ticksAlive;
+        public bool isFaded;
+        
+        public int actorId;
+        public ActorType actorType;
+        public Vector3 position;
+        public Rotation rotation;
 
         protected GameObject(ActorType actorType, Vector3 position, Rotation rotation)
         {
             this.ticksAlive = 0;
+            this.isFaded = false;
 
             this.actorId = IdHelper.RequestUniqueId();
             this.actorType = actorType;

@@ -281,27 +281,8 @@ namespace Adv.Server
 
                     Console.WriteLine($"ActivatePacket - name: {activatePacket.Name} + pos: {activatePacket.Position.X} {activatePacket.Position.Y} {activatePacket.Position.Z}");
 
-                    var fireballSpawnPacket = GameConnectionApi.CreateActorSpawnPacket(3421, ActorType.Fireball,
-                        currentCharacter.Position.AddToCoords(x:200), currentCharacter.Rotation, 16);
+                    controller.CreateFireball(currentCharacter.Position.AddToCoords(x: 200), currentCharacter.Rotation);
 
-                    client.GetStream().Write(fireballSpawnPacket);
-                    
-                    int timeLeft = 1;
-                    Timer timer = null;
-                    timer = new Timer(callback =>
-                    {
-                        var fireballUpdatePacket =
-                            GameConnectionApi.CreateServerPositionPacket(3421, currentCharacter.Position.AddToCoords(x: 20*timeLeft), currentCharacter.Rotation);
-                        
-                        client.GetStream().Write(fireballUpdatePacket);
-                        
-                        timeLeft += 1;
-                        if (timeLeft > 300)
-                        {
-                            timer.Change(Timeout.Infinite, Timeout.Infinite);
-                        }
-                    }, null, 10, 100);
-                    
                     return (null, false);
                 case GamePacketType.FireRequest:
                     break;

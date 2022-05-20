@@ -15,6 +15,13 @@ namespace Adv.Server.Game.Model.GameObjects
         public override void Tick()
         {
             base.Tick();
+
+            position = position.AddToCoords(50);
+
+            if (ticksAlive > 100)
+            {
+                isFaded = true;
+            }
         }
     }
 }

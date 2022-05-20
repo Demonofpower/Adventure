@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Numerics;
 using System.Threading;
 using Adv.Server.Game.Model.GameObjects;
+using Adv.Server.Util;
+using Adv.Server.Util.Enums;
 
 namespace Adv.Server.Game.Processing
 {
@@ -42,10 +45,19 @@ namespace Adv.Server.Game.Processing
             //TODO
             currTick += 1;
             Console.WriteLine($"Tick {currTick}");
-            foreach (var gameObject in gameObjects)
+            for (var index = 0; index < gameObjects.Count; index++)
             {
+                var gameObject = gameObjects[index];
+                if (gameObject.isFaded)
+                {
+                    gameObjects.Remove(gameObject);
+                    continue;
+                }
+
                 gameObject.Tick();
             }
+
+            CreatePackets();
             packetManager.Flush();
 
             stopwatch.Stop();
@@ -58,13 +70,34 @@ namespace Adv.Server.Game.Processing
             {
                 Console.WriteLine($"TICK TOOK TOO LONG {currTick}");
             }
-
-            CreateFireball();
         }
 
-        public void CreateFireball()
+        private void CreatePackets()
         {
-            gameObjects.Add(new Fireball());
+            foreach (var gameObject in gameObjects)
+            {
+                switch (gameObject)
+                {
+                    case Fireball c:
+                        var fireballUpdatePacket =
+                            GameConnectionApi.CreateServerPositionPacket(c.actorId, c.position, c.rotation);
+                        packetManager.Enqueue(fireballUpdatePacket);
+                        break;
+                    default:
+                        throw new NotImplementedException(nameof(gameObject));
+                    case null:
+                        throw new ArgumentNullException(nameof(gameObject));
+                }
+            }
+        }
+
+        public void CreateFireball(Vector3 position, Rotation rotation)
+        {
+            var fireball = new Fireball(position, rotation);
+            gameObjects.Add(fireball);
+            var fireballSpawnPacket = GameConnectionApi.CreateActorSpawnPacket(fireball.actorId, fireball.actorType,
+                fireball.position, fireball.rotation, 16);
+            packetManager.Enqueue(fireballSpawnPacket);
         }
     }
 }
