@@ -16,7 +16,7 @@ namespace Adv.Server.Game.Model.GameObjects
         {
             base.Tick();
 
-            position = position.AddToCoords(50);
+            //position = position.AddToCoords(50);
 
             if (ticksAlive > 100)
             {

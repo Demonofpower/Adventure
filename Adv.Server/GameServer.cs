@@ -281,7 +281,7 @@ namespace Adv.Server
 
                     Console.WriteLine($"ActivatePacket - name: {activatePacket.Name} + pos: {activatePacket.Position.X} {activatePacket.Position.Y} {activatePacket.Position.Z}");
 
-                    controller.CreateFireball(currentCharacter.Position.AddToCoords(x: 200), currentCharacter.Rotation);
+                    controller.CreateFireball(currentCharacter.Position.AddToCoords(x:0, 100, 0), currentCharacter.Rotation);
 
                     return (null, false);
                 case GamePacketType.FireRequest:
@@ -331,7 +331,8 @@ namespace Adv.Server
             sessions = new Dictionary<TcpClient, Tuple<string, Character>>();
 
             Actors = new List<Actor>();
-            Actors.Add(new Actor(100, ActorType.GreatBallsOfFire, new Vector3(-43653.71f, - 55836.54f, 405.65f), new Rotation(-16384, 0, -16451)));
+            //Actors.Add(new Actor(100, ActorType.GreatBallsOfFire, new Vector3(-43653.71f, - 55836.54f, 405.65f), new Rotation(-16384, 0, -16451)));
+            Actors.Add(new Actor(100, ActorType.GreatBallsOfFire, new Vector3(-54150f, -56283f, 1000), new Rotation(-16384, 0, -16451)));
 
             useHandler = new UseHandler(Actors);
 

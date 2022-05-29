@@ -19,7 +19,11 @@ namespace Adv.Server.Game.Processing
             {
                 var success = queuedPackets.TryDequeue(out var currPacket);
 
-                //TODO
+                foreach (var tcpClient in GameServer.sessions.Keys)
+                {
+                    var clientStream = tcpClient.GetStream();
+                    clientStream.Write(currPacket);
+                }
             }
         }
 

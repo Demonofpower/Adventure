@@ -11,7 +11,7 @@ namespace Adv.Server.Game.Processing
 {
     class Controller
     {
-        private const int TickTime = 50;
+        private const int TickTime = 100;
 
         private readonly PacketManager packetManager;
         private ulong currTick;
@@ -44,7 +44,7 @@ namespace Adv.Server.Game.Processing
 
             //TODO
             currTick += 1;
-            Console.WriteLine($"Tick {currTick}");
+            //Console.WriteLine($"Tick {currTick}");
             for (var index = 0; index < gameObjects.Count; index++)
             {
                 var gameObject = gameObjects[index];
@@ -95,9 +95,13 @@ namespace Adv.Server.Game.Processing
         {
             var fireball = new Fireball(position, rotation);
             gameObjects.Add(fireball);
+
+            Console.WriteLine($"Create Fireball {fireball.actorId} {fireball.position.X} {fireball.position.Y} {fireball.position.Z}");
+
             var fireballSpawnPacket = GameConnectionApi.CreateActorSpawnPacket(fireball.actorId, fireball.actorType,
                 fireball.position, fireball.rotation, 16);
             packetManager.Enqueue(fireballSpawnPacket);
+            packetManager.Flush();
         }
     }
 }

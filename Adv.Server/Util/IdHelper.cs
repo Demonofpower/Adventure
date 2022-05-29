@@ -10,7 +10,7 @@ namespace Adv.Server.Util
         static IdHelper()
         {
             existingIds = new HashSet<int>();
-            newestId = 100;
+            newestId = 2222;
         }
 
         public static int RequestUniqueId()
