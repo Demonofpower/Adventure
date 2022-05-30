@@ -65,7 +65,7 @@ namespace Adv.Server.Game
             return packet.ToArray();
         }
 
-        public static byte[] CreateActorSpawnPacket(int actorId, ActorType actor, Vector3 position, Rotation rotation, int unknown = 0)
+        public static byte[] CreateActorSpawnPacket(int actorId, ActorType actor, Vector3 position, Rotation rotation, int unknownA_SometimesSenderCharId = 0, int unknownB = 0)
         {
             var packet = new List<byte>();
 
@@ -74,12 +74,26 @@ namespace Adv.Server.Game
             packet.Write8(0x6b);
 
             packet.Write32(actorId);
-            packet.Write32(unknown);
+            packet.Write32(unknownA_SometimesSenderCharId);
             packet.Write8(0x0);
             packet.WriteString(actor.ToString());
             packet.WriteVector3(position);
             packet.WriteRotation(rotation);
-            packet.Write32(0x0);
+            packet.Write32(unknownB);
+
+            return packet.ToArray();
+        }
+
+        public static byte[] CreateActorDestroyPacket(int actorId)
+        {
+            var packet = new List<byte>();
+
+            //PACKETID
+            packet.Write8(0x78);
+            packet.Write8(0x78);
+
+            packet.Write32(actorId);
+            packet.Write16(0x0); //--unknownA_SometimesSenderCharId
 
             return packet.ToArray();
         }
@@ -305,8 +319,8 @@ namespace Adv.Server.Game
         {
             var packet = new List<byte>();
 
-            packet.Write8(0x61);
             packet.Write8(0x6d);
+            packet.Write8(0x61);
 
             packet.Write32(mana);
 

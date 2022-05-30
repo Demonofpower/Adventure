@@ -15,9 +15,9 @@ namespace Adv.Server.Game.Model.Objects.GameObjects
         {
             base.Tick();
 
-            //position = position.AddToCoords(50);
+            position = position.AddToCoords(50);
 
-            if (TicksAlive > 100)
+            if (TicksAlive > 20)
             {
                 IsFaded = true;
             }

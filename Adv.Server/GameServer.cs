@@ -281,7 +281,7 @@ namespace Adv.Server
 
                     Console.WriteLine($"ActivatePacket - name: {activatePacket.Name} + pos: {activatePacket.Position.X} {activatePacket.Position.Y} {activatePacket.Position.Z}");
 
-                    controller.CreateFireball(currentCharacter.Position.AddToCoords(x:0, 100, 0), currentCharacter.Rotation);
+                    controller.CreateFireball(currentCharacter.Position.AddToCoords(x:0, 100, 0), currentCharacter.Rotation, currentCharacter);
 
                     return (null, false);
                 case GamePacketType.FireRequest:

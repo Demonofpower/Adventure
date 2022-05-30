@@ -19,6 +19,7 @@ namespace Adv.Server.Master
         public User User { get; set; }
 
         public int Health { get; set; }
+        public int Mana { get; set; }
         public Vector3 Position { get; set; }
         public Rotation Rotation { get; set; }
         public bool PvPEnabled { get; set; }
@@ -39,6 +40,7 @@ namespace Adv.Server.Master
             Id = id;
             
             Health = 100;
+            Mana = 100;
             PvPEnabled = false;
         }
     }

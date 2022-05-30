@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Threading;
 using Adv.Server.Game.Model.Objects.GameObjects;
+using Adv.Server.Master;
 using Adv.Server.Util;
 
 namespace Adv.Server.Game.Processing
@@ -82,6 +83,11 @@ namespace Adv.Server.Game.Processing
                         var fireballUpdatePacket =
                             GameConnectionApi.CreateServerPositionPacket(c.actorId, c.position, c.rotation);
                         PacketManager.Enqueue(fireballUpdatePacket);
+                        
+                        if (c.IsFaded)
+                        {
+                            PacketManager.Enqueue(GameConnectionApi.CreateActorDestroyPacket(c.actorId));
+                        }
                         break;
                     default:
                         throw new NotImplementedException(nameof(gameObject));
@@ -91,16 +97,21 @@ namespace Adv.Server.Game.Processing
             }
         }
 
-        public void CreateFireball(Vector3 position, Rotation rotation)
+        public void CreateFireball(Vector3 position, Rotation rotation, Character sender)
         {
             var fireball = new Fireball(position, rotation);
             gameObjects.Add(fireball);
 
+            sender.Mana -= 5;
+
             Console.WriteLine($"Create Fireball {fireball.actorId} {fireball.position.X} {fireball.position.Y} {fireball.position.Z}");
 
             var fireballSpawnPacket = GameConnectionApi.CreateActorSpawnPacket(fireball.actorId, fireball.actorType,
-                fireball.position, fireball.rotation, 16);
+                fireball.position, fireball.rotation, sender.Id, 0x64);
+
+            PacketManager.Enqueue(GameConnectionApi.CreateServerManaUpdatePacket(sender.Mana));
             PacketManager.Enqueue(fireballSpawnPacket);
+            PacketManager.Enqueue(GameConnectionApi.CreateServerPositionPacket(fireball.actorId, fireball.position, fireball.rotation));
             PacketManager.Flush();
         }
     }
