@@ -4,7 +4,7 @@ using Adv.Server.Util.Enums;
 
 namespace Adv.Server.Master
 {
-    class Character
+    public class Character
     {
         public int Id { get; set; }
         public string Name { get; set; }

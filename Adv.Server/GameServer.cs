@@ -65,7 +65,7 @@ namespace Adv.Server
                         var helloReply = GameConnectionApi.CreateServerHelloPacket(clientHelloPacket.CharacterId, pos, rot);
                         networkStream.Write(helloReply);
 
-                        SendToAllExceptClient(GameConnectionApi.CreateServerPlayerJoinedPacket(sessions[client].Item2), client);
+                        ClientHelper.SendToAllExceptClient(GameConnectionApi.CreateServerPlayerJoinedPacket(sessions[client].Item2), client);
                         foreach (var session in sessions)
                         {
                             if (session.Key != client)
@@ -187,8 +187,8 @@ namespace Adv.Server
                         if (pvpEnableTimeLeft < 0)
                         {
                             client.GetStream().Write(GameConnectionApi.CreateServerPvpEnablePacket(pvpEnablePacket.State));
-                            
-                            SendToAllExceptClient(GameConnectionApi.CreateServerStatePacket(currentCharacter.Id, State.PvP, pvpEnablePacket.State), client);
+
+                            ClientHelper.SendToAllExceptClient(GameConnectionApi.CreateServerStatePacket(currentCharacter.Id, State.PvP, pvpEnablePacket.State), client);
 
                             currentCharacter.PvPEnabled = pvpEnablePacket.State != 0;
                             
@@ -207,7 +207,7 @@ namespace Adv.Server
                     currentCharacter.Position = clientPosition.Position;
                     currentCharacter.Rotation = clientPosition.Rotation;
 
-                    SendToAllExceptClient(GameConnectionApi.CreateServerPlayerPositionPacket(currentCharacter), client);
+                    ClientHelper.SendToAllExceptClient(GameConnectionApi.CreateServerPlayerPositionPacket(currentCharacter), client);
 
                     return (
                         GameConnectionApi.CreateServerPositionPacket(currentCharacter.Id, clientPosition.Position,
@@ -299,7 +299,7 @@ namespace Adv.Server
                     var clientJumpPacket = GameConnectionApi.ProcessClientJumpPacket(ref packet);
                     Console.WriteLine("JumpPacket - state: " + clientJumpPacket.JumpState);
 
-                    SendToAllExceptClient(
+                    ClientHelper.SendToAllExceptClient(
                         GameConnectionApi.CreateServerStatePacket(currentCharacter.Id, State.Jump,
                             clientJumpPacket.JumpState), client);
 
@@ -313,17 +313,6 @@ namespace Adv.Server
             }
 
             throw new NotImplementedException();
-        }
-
-        private void SendToAllExceptClient(byte[] packet, TcpClient client)
-        {
-            foreach (var session in sessions)
-            {
-                if (session.Value != null && session.Key != client)
-                {
-                    session.Key.GetStream().Write(packet);
-                }
-            }
         }
 
         private void Populate()

@@ -1,6 +1,6 @@
 ﻿namespace Adv.Server.Master
 {
-    class Team
+    public class Team
     {
         public int Id { get; set; }
         

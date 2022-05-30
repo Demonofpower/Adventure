@@ -5,22 +5,22 @@ using System.Numerics;
 using System.Threading;
 using Adv.Server.Game.Model.Objects.GameObjects;
 using Adv.Server.Util;
-using Adv.Server.Util.Enums;
 
 namespace Adv.Server.Game.Processing
 {
     class Controller
     {
+        public static PacketManager PacketManager;
+
         private const int TickTime = 100;
 
-        private readonly PacketManager packetManager;
         private ulong currTick;
 
         private List<GameObject> gameObjects;
 
         public Controller(PacketManager packetManager)
         {
-            this.packetManager = packetManager;
+            PacketManager = packetManager;
             currTick = 0;
 
             gameObjects = new List<GameObject>();
@@ -58,7 +58,7 @@ namespace Adv.Server.Game.Processing
             }
 
             CreatePackets();
-            packetManager.Flush();
+            PacketManager.Flush();
 
             stopwatch.Stop();
             var sleepTime = stopwatch.Elapsed.Milliseconds;
@@ -81,7 +81,7 @@ namespace Adv.Server.Game.Processing
                     case Fireball c:
                         var fireballUpdatePacket =
                             GameConnectionApi.CreateServerPositionPacket(c.actorId, c.position, c.rotation);
-                        packetManager.Enqueue(fireballUpdatePacket);
+                        PacketManager.Enqueue(fireballUpdatePacket);
                         break;
                     default:
                         throw new NotImplementedException(nameof(gameObject));
@@ -100,8 +100,8 @@ namespace Adv.Server.Game.Processing
 
             var fireballSpawnPacket = GameConnectionApi.CreateActorSpawnPacket(fireball.actorId, fireball.actorType,
                 fireball.position, fireball.rotation, 16);
-            packetManager.Enqueue(fireballSpawnPacket);
-            packetManager.Flush();
+            PacketManager.Enqueue(fireballSpawnPacket);
+            PacketManager.Flush();
         }
     }
 }
