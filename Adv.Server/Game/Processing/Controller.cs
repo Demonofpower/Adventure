@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Numerics;
 using System.Threading;
-using Adv.Server.Game.Model.GameObjects;
+using Adv.Server.Game.Model.Objects.GameObjects;
 using Adv.Server.Util;
 using Adv.Server.Util.Enums;
 
@@ -48,7 +48,7 @@ namespace Adv.Server.Game.Processing
             for (var index = 0; index < gameObjects.Count; index++)
             {
                 var gameObject = gameObjects[index];
-                if (gameObject.isFaded)
+                if (gameObject.IsFaded)
                 {
                     gameObjects.Remove(gameObject);
                     continue;

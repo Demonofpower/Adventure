@@ -2,13 +2,13 @@
 using Adv.Server.Util;
 using Adv.Server.Util.Enums;
 
-namespace Adv.Server.Game.Model.GameObjects
+namespace Adv.Server.Game.Model.Objects.GameObjects
 {
-    abstract class GameObject
+    abstract class GameObject : IObject
     {
-        public ulong ticksAlive;
-        public bool isFaded;
-        
+        public ulong TicksAlive { get; set; }
+        public bool IsFaded { get; set; }
+
         public int actorId;
         public ActorType actorType;
         public Vector3 position;
@@ -16,8 +16,8 @@ namespace Adv.Server.Game.Model.GameObjects
 
         protected GameObject(ActorType actorType, Vector3 position, Rotation rotation)
         {
-            this.ticksAlive = 0;
-            this.isFaded = false;
+            this.TicksAlive = 0;
+            this.IsFaded = false;
 
             this.actorId = IdHelper.RequestUniqueId();
             this.actorType = actorType;
@@ -27,7 +27,7 @@ namespace Adv.Server.Game.Model.GameObjects
 
         public virtual void Tick()
         {
-            ticksAlive += 1;
+            TicksAlive += 1;
         }
     }
 }

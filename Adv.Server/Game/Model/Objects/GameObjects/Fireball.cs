@@ -1,9 +1,8 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using Adv.Server.Util;
 using Adv.Server.Util.Enums;
 
-namespace Adv.Server.Game.Model.GameObjects
+namespace Adv.Server.Game.Model.Objects.GameObjects
 {
     class Fireball : GameObject
     {
@@ -18,9 +17,9 @@ namespace Adv.Server.Game.Model.GameObjects
 
             //position = position.AddToCoords(50);
 
-            if (ticksAlive > 100)
+            if (TicksAlive > 100)
             {
-                isFaded = true;
+                IsFaded = true;
             }
         }
     }
