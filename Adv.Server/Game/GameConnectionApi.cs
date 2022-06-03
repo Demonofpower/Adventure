@@ -326,5 +326,18 @@ namespace Adv.Server.Game
 
             return packet.ToArray();
         }
+
+        public static byte[] CreateServerHealthUpdatePacket(int health)
+        {
+            var packet = new List<byte>();
+
+            packet.Write8(0x2b);
+            packet.Write8(0x2b);
+
+            packet.Write32(health);
+            packet.Write32(health);
+
+            return packet.ToArray();
+        }
     }
 }

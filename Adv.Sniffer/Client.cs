@@ -343,6 +343,9 @@ namespace Adv.Sniffer
 
         private bool Catch(string data, Sender sender, ServerType type)
         {
+            if (data.StartsWith("0000")) return true;
+            if (data.StartsWith("6d76")) return true;
+            
             if (type == ServerType.Game)
             {
                 Console.Write("[Game] ");

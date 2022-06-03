@@ -58,6 +58,9 @@ namespace Adv.Server.Game.Processing
                 gameObject.Tick();
             }
 
+            UpdateHealth();
+            UpdateMana();
+            
             CreatePackets();
             PacketManager.Flush();
 
@@ -73,6 +76,30 @@ namespace Adv.Server.Game.Processing
             }
         }
 
+        private void UpdateHealth()
+        {
+            foreach (var client in GameServer.sessions)
+            {
+                if (client.Value.Item2.Health < 100)
+                {
+                    var healthUpdatePacket = GameConnectionApi.CreateServerHealthUpdatePacket(++client.Value.Item2.Health);
+                    PacketManager.Enqueue(new PacketManagerPacket(healthUpdatePacket, ClientHelper.GeTcpClientByCharacter(client.Value.Item2)));
+                }
+            }
+        }
+
+        private void UpdateMana()
+        {
+            foreach (var client in GameServer.sessions)
+            {
+                if (client.Value.Item2.Mana < 100)
+                {
+                    var manaUpdatePacket = GameConnectionApi.CreateServerManaUpdatePacket(++client.Value.Item2.Mana);
+                    PacketManager.Enqueue(new PacketManagerPacket(manaUpdatePacket, ClientHelper.GeTcpClientByCharacter(client.Value.Item2)));
+                }
+            }
+        }
+        
         private void CreatePackets()
         {
             foreach (var gameObject in gameObjects)
