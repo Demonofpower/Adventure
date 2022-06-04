@@ -339,5 +339,18 @@ namespace Adv.Server.Game
 
             return packet.ToArray();
         }
+
+        public static byte[] CreateServerDisplayPacket(string title, string message)
+        {
+            var packet = new List<byte>();
+
+            packet.Write8(0x65);
+            packet.Write8(0x76);
+
+            packet.WriteString(title);
+            packet.WriteString(message);
+
+            return packet.ToArray();
+        }
     }
 }

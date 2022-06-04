@@ -1,4 +1,5 @@
 ﻿using System;
+using Adv.Server.Game.Processing;
 using Adv.Server.Master;
 
 namespace Adv.Server.Game
@@ -28,6 +29,10 @@ namespace Adv.Server.Game
                     case "!mana":
                         sender.Mana = Convert.ToInt32(args[1]);
                         Console.WriteLine($"{sender.Name} new mana: {sender.Mana}");
+                        break;
+                    case "!bc":
+                        Controller.PacketManager.Enqueue(GameConnectionApi.CreateServerDisplayPacket(args[1], args[2]));
+                        Console.WriteLine($"{sender.Name} broadcast: {args[1]} - {args[2]}");
                         break;
                     default:
                         Console.WriteLine("Unknown command!");
