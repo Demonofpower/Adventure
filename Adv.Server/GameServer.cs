@@ -178,24 +178,8 @@ namespace Adv.Server
                 case GamePacketType.OnPvpEnableEvent:
                     var pvpEnablePacket = GameConnectionApi.ProcessClientPvPEnablePacket(ref packet);
 
-                    int pvpEnableTimeLeft = 5;
-                    Timer pvpEnableTimer = null;
-                    pvpEnableTimer = new Timer(callback =>
-                    {
-                        client.GetStream().Write(GameConnectionApi.CreateServerPvpCountdownUpdatePacket(pvpEnablePacket.State, pvpEnableTimeLeft));
-                        pvpEnableTimeLeft -= 1;
-                        if (pvpEnableTimeLeft < 0)
-                        {
-                            client.GetStream().Write(GameConnectionApi.CreateServerPvpEnablePacket(pvpEnablePacket.State));
-
-                            ClientHelper.SendToAllExceptClient(GameConnectionApi.CreateServerStatePacket(currentCharacter.Id, State.PvP, pvpEnablePacket.State), client);
-
-                            currentCharacter.PvPEnabled = pvpEnablePacket.State != 0;
-                            
-                            pvpEnableTimer.Change(Timeout.Infinite, Timeout.Infinite);
-                        }
-                    }, null, 0, 1000);
-
+                    controller.CreatePvPEnableEvent(Convert.ToBoolean(pvpEnablePacket.State), currentCharacter);
+                    
                     return (null, false);
                 case GamePacketType.OnPvpCountdownUpdateEvent:
                     break;

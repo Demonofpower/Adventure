@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Numerics;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading;
+using Adv.Server.Game.Model.Objects;
+using Adv.Server.Game.Model.Objects.EventObjects;
 using Adv.Server.Game.Model.Objects.GameObjects;
 using Adv.Server.Master;
 using Adv.Server.Util;
@@ -17,14 +21,14 @@ namespace Adv.Server.Game.Processing
 
         private ulong currTick;
 
-        private List<GameObject> gameObjects;
+        private List<IObject> gameObjects;
 
         public Controller(PacketManager packetManager)
         {
             PacketManager = packetManager;
             currTick = 0;
 
-            gameObjects = new List<GameObject>();
+            gameObjects = new List<IObject>();
         }
 
         public void Start()
@@ -117,7 +121,8 @@ namespace Adv.Server.Game.Processing
                         }
                         break;
                     default:
-                        throw new NotImplementedException(nameof(gameObject));
+                        Console.WriteLine($"Not implemented packet {gameObject.GetType()}");
+                        return;
                     case null:
                         throw new ArgumentNullException(nameof(gameObject));
                 }
@@ -140,6 +145,31 @@ namespace Adv.Server.Game.Processing
             PacketManager.Enqueue(fireballSpawnPacket);
             PacketManager.Enqueue(GameConnectionApi.CreateServerPositionPacket(fireball.actorId, fireball.position, fireball.rotation));
             PacketManager.Flush();
+        }
+
+        public void CreatePvPEnableEvent(bool enable, Character sender)
+        {
+            var oldPvPEvent = gameObjects.FirstOrDefault(o =>
+            {
+                if (o is PvPEnableEvent e)
+                {
+                    if (e.EventCharacter == sender)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            });
+            
+            if (oldPvPEvent != null)
+            {
+                gameObjects.Remove(oldPvPEvent);
+                return;
+            }
+            
+            var pvpEvent = new PvPEnableEvent(enable, sender);
+            gameObjects.Add(pvpEvent);
         }
     }
 }

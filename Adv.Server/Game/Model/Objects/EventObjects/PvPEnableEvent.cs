@@ -7,30 +7,41 @@ namespace Adv.Server.Game.Model.Objects.EventObjects
 {
     class PvPEnableEvent : EventObject
     {
-        private readonly Character eventCharacter;
-        private readonly bool isPvpNowEnabled;
+        public Character EventCharacter { get; }
+        private bool IsPvpNowEnabled { get; }
+
+        private int countdownLeft;
 
         public PvPEnableEvent(bool isPvpNowEnabled, Character eventCharacter)
         {
-            this.isPvpNowEnabled = isPvpNowEnabled;
-            this.eventCharacter = eventCharacter;
+            IsPvpNowEnabled = isPvpNowEnabled;
+            EventCharacter = eventCharacter;
+
+            countdownLeft = 5;
         }
 
         public override void Tick()
         {
             base.Tick();
 
-            var characterStream = ClientHelper.GeTcpClientByCharacter(eventCharacter).GetStream();
-            characterStream.Write(GameConnectionApi.CreateServerPvpCountdownUpdatePacket(Convert.ToByte(isPvpNowEnabled), (int) ((50 - TicksAlive)/10)));
-
-            if (TicksAlive >= 50)
+            if (TicksAlive == 1 || TicksAlive % 10 == 0)
             {
-                eventCharacter.PvPEnabled = isPvpNowEnabled;
+                var characterStream = ClientHelper.GeTcpClientByCharacter(EventCharacter).GetStream();
 
-                characterStream.Write(GameConnectionApi.CreateServerPvpEnablePacket(Convert.ToByte(isPvpNowEnabled)));
-                ClientHelper.SendToAllExceptCharacter(GameConnectionApi.CreateServerStatePacket(eventCharacter.Id, State.PvP, Convert.ToByte(isPvpNowEnabled)), eventCharacter);
+                if (countdownLeft == 0) 
+                {
+                    EventCharacter.PvPEnabled = IsPvpNowEnabled;
 
-                IsFaded = true;
+                    characterStream.Write(GameConnectionApi.CreateServerPvpEnablePacket(Convert.ToByte(IsPvpNowEnabled)));
+                    ClientHelper.SendToAllExceptCharacter(GameConnectionApi.CreateServerStatePacket(EventCharacter.Id, State.PvP, Convert.ToByte(IsPvpNowEnabled)), EventCharacter);
+
+                    IsFaded = true;
+                    return;
+                }
+
+                characterStream.Write(GameConnectionApi.CreateServerPvpCountdownUpdatePacket(Convert.ToByte(IsPvpNowEnabled), countdownLeft));
+
+                countdownLeft -= 1;
             }
         }
     }
